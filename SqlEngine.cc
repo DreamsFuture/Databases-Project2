@@ -134,11 +134,10 @@ RC SqlEngine::load(const string& table, const string& loadfile, bool index)
   int retval = 0;
 
   /* Open loadfile */
-  FILE* load_file = fopen(loadfile.c_str(),"r");
-  if(load_file == NULL)
-    {
-      exit(5);
-    /*Need to figure out what to return if fopen fails */};
+  ifstream fs;
+  fs.open(loadfile.c_str());
+  if(fs.is_open()){};
+    /*Need to figure out what to return if fopen fails */
 
   /* Initialize RecordFile instance and open in write mode */
   string record_file_name = table + ".tbl";
@@ -149,30 +148,20 @@ RC SqlEngine::load(const string& table, const string& loadfile, bool index)
 
   
   /* Parse loadfile line-by-line and enter records into record file */
-  char next_char = fgetc(load_file);
-  while(next_char != EOF)
-  {
     string next_line = "";
-    while(next_char != '\n') {
-      if(next_char == EOF) break;
-      
-      next_line += next_char;
-      next_char = fgetc(load_file);
+    while(getline(fs,next_line))
+    {
+      int key; string value;
+      parseLoadLine(next_line,key,value);
 
-    }
+      RecordId record_file_pos = record_file.endRid();
+      record_file.append(key,value,record_file_pos);
 
-    int key = 0;
-    string value;
-    parseLoadLine(next_line,key,value);
-    
-    RecordId next_record = record_file.endRid();
-    retval = record_file.append(key,value,next_record);
+    } 
 
-    if(retval != 0)
-      return retval;
-  }
-  record_file.close();
-  return 0;
+    fs.close();
+    record_file.close();
+    return 0;
 }
 
 RC SqlEngine::parseLoadLine(const string& line, int& key, string& value)
