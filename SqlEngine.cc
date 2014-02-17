@@ -136,39 +136,42 @@ RC SqlEngine::load(const string& table, const string& loadfile, bool index)
   /* Open loadfile */
   FILE* load_file = fopen(loadfile.c_str(),"r");
   if(load_file == NULL)
-    {/*Need to figure out what to return if fopen fails */};
+    {
+      exit(5);
+    /*Need to figure out what to return if fopen fails */};
 
   /* Initialize RecordFile instance and open in write mode */
   string record_file_name = table + ".tbl";
-  RecordFile record_file = RecordFile::RecordFile(record_file_name,'w');
+  RecordFile record_file;
   retval = record_file.open(record_file_name,'w');
   if (retval != 0)   
       return retval;
 
   
   /* Parse loadfile line-by-line and enter records into record file */
-  char next_char;
-  string next_line = NULL;
+  char next_char = fgetc(load_file);
   while(next_char != EOF)
   {
-    next_char = fgetc(load_file);
+    string next_line = "";
     while(next_char != '\n') {
-      next_char = fgetc(load_file);
+      if(next_char == EOF) break;
+      
       next_line += next_char;
+      next_char = fgetc(load_file);
 
     }
 
     int key = 0;
-    string value = NULL;
+    string value;
     parseLoadLine(next_line,key,value);
-
+    
     RecordId next_record = record_file.endRid();
     retval = record_file.append(key,value,next_record);
 
     if(retval != 0)
       return retval;
   }
-
+  record_file.close();
   return 0;
 }
 
