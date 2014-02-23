@@ -13,6 +13,21 @@
 #include "RecordFile.h"
 #include "PageFile.h"
 
+// Struct to implement a linked-list that holds keys 
+ typedef struct {
+    int key;
+    union {
+        PageId pid;
+        RecordId rid;
+    } u;
+ } node;
+
+// List struct to hold list of key, pid pairs
+ typedef struct {
+    int count;
+    node* next;
+ } list;
+
 /**
  * BTLeafNode: The class representing a B+tree leaf node.
  */
@@ -180,6 +195,12 @@ class BTNonLeafNode {
     * that contains the node.
     */
     char buffer[PageFile::PAGE_SIZE];
+   
+   /**
+    * Linked list that holds the list of keys stored in the node
+    */
+    list key_list;
+
 }; 
 
 #endif /* BTNODE_H */
