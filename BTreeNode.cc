@@ -9,7 +9,11 @@ using namespace std;
  * @return 0 if successful. Return an error code if there is an error.
  */
 RC BTLeafNode::read(PageId pid, const PageFile& pf)
-{ return 0; }
+{ 
+	  int ret = pf.read(pid,buffer);
+	  
+	  return ret;
+}
     
 /*
  * Write the content of the node to the page pid in the PageFile pf.
@@ -18,7 +22,11 @@ RC BTLeafNode::read(PageId pid, const PageFile& pf)
  * @return 0 if successful. Return an error code if there is an error.
  */
 RC BTLeafNode::write(PageId pid, PageFile& pf)
-{ return 0; }
+{ 
+ 	  int ret = pf.write(pid,buffer);
+
+	  return ret;
+}
 
 /*
  * Return the number of keys stored in the node.
@@ -203,7 +211,89 @@ RC BTNonLeafNode::insert(int key, PageId pid)
  * @return 0 if successful. Return an error code if there is an error.
  */
 RC BTNonLeafNode::insertAndSplit(int key, PageId pid, BTNonLeafNode& sibling, int& midKey)
-{ return 0; }
+{ 
+	list_node* temp = new list_node;
+	temp->key = key;
+	temp->id.pid = pid;
+
+/* Insert the given pair into this node */
+
+	if(list == NULL)
+		{
+			list = temp;
+		}
+
+	else {
+		list_node* curr = list;
+
+		if(list->key > temp->key)
+		{
+			temp->next = curr;
+			list = temp;
+		}
+
+	else {
+		while(curr)
+		{
+			if(!curr->next)
+				{
+					curr->next = temp;
+					break;
+				}
+
+			if(curr->next->key > temp->key)
+			{
+				temp->next = curr->next;
+				curr->next = temp;
+				break;
+			}
+
+			curr = curr->next;
+
+		}
+
+	}
+		
+	}
+
+/* Find the middle pair in this node */
+
+	list_node* mid = list;
+	list_node* fast = list;
+
+	while(fast->next->next != NULL)
+	{
+		fast = fast->next->next;
+		mid = mid->next;
+	}
+
+/* Add all pairs after mid to the sibling node */
+
+	midKey = mid->key;
+
+	mid = mid->next;
+	while(mid->next != NULL)
+	{
+		sibling.insert(mid->key,mid->id.pid);
+		mid = mid->next;
+	}
+
+/* Free all pairs after the middle one in the current node */ 
+
+	list_node* curr;
+	while(mid->next != NULL)
+	{
+		curr = mid;
+		mid = mid->next;
+		delete curr;
+
+	}
+
+
+
+
+
+}
 
 /*
  * Given the searchKey, find the child-node pointer to follow and

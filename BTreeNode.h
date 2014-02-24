@@ -27,7 +27,7 @@ typedef struct list_node list_node;
 
 
 /* N for B+ Tree */
-#define N PageFile::PAGE_SIZE/sizeof(list_node)
+#define N (PageFile::PAGE_SIZE - sizeof(int) - sizeof(PageId))/sizeof(list_node)
 
 /**
  * BTLeafNode: The class representing a B+tree leaf node.
@@ -117,6 +117,10 @@ class BTLeafNode {
     */
     RC write(PageId pid, PageFile& pf);
 
+
+    list_node* list;
+
+    
   private:
    /**
     * The main memory buffer for loading the content of the disk page 
@@ -124,15 +128,20 @@ class BTLeafNode {
     */
     char buffer[PageFile::PAGE_SIZE];
 
-    /**
+   /**
     * Linked list that holds the list of keys stored in the node
     */
-    list_node* list;
 
     /**
     * Counter to track the number of keys currently in node
     */
     int count;
+
+    /**
+     * Pid that points to the node that holds keys greater than all the keys in this node.
+     * i.e. last pid in the list
+     */
+     PageId end_pid;
 }; 
 
 
@@ -210,7 +219,7 @@ class BTNonLeafNode {
     */
     RC write(PageId pid, PageFile& pf);
 
-    //inline list_node* getlist() {return list;};
+
     list_node* list;
 
   private:

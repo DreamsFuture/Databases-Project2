@@ -23,6 +23,7 @@ int main()
 
 
 BTNonLeafNode node;
+BTNonLeafNode sib;
 /*
 node.insert(10,0);
 node.insert(5,1);
