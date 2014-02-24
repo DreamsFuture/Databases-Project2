@@ -229,6 +229,12 @@ class BTNonLeafNode {
     */
     int count;
 
+    /**
+     * Pid that points to the node that holds keys greater than all the keys in this node.
+     * i.e. last pid in the list
+     */
+     PageId end_pid;
+
 
 }; 
 

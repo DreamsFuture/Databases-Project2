@@ -93,6 +93,7 @@ BTNonLeafNode::BTNonLeafNode()
 {
 	count = 0;
 	list = NULL;
+	end_pid = 0;
 
 }
 
@@ -160,7 +161,7 @@ RC BTNonLeafNode::insert(int key, PageId pid)
 			list = temp;
 		}
 
-		else {
+	else {
 		while(curr)
 		{
 			if(!curr->next)
@@ -186,6 +187,8 @@ RC BTNonLeafNode::insert(int key, PageId pid)
 
 	count++;
 
+	return 0;
+
 }
 
 
@@ -210,7 +213,23 @@ RC BTNonLeafNode::insertAndSplit(int key, PageId pid, BTNonLeafNode& sibling, in
  * @return 0 if successful. Return an error code if there is an error.
  */
 RC BTNonLeafNode::locateChildPtr(int searchKey, PageId& pid)
-{ return 0; }
+{ 
+	list_node* curr = list;
+	while(curr->key < searchKey)
+	{
+		if(curr->next == NULL)
+		{
+			pid = end_pid;
+			return 0;
+		}
+
+		curr = curr->next;
+	}
+
+	pid = curr->id.pid;
+
+	return 0; 
+}
 
 /*
  * Initialize the root node with (pid1, key, pid2).
@@ -220,4 +239,14 @@ RC BTNonLeafNode::locateChildPtr(int searchKey, PageId& pid)
  * @return 0 if successful. Return an error code if there is an error.
  */
 RC BTNonLeafNode::initializeRoot(PageId pid1, int key, PageId pid2)
-{ return 0; }
+{ 
+	list = new list_node;
+	list->key = key;
+	list->id.pid = pid1;
+
+	end_pid = pid2;
+	count++;
+	
+	return 0; 
+
+}
