@@ -13,26 +13,32 @@
 #include "RecordFile.h"
 #include "PageFile.h"
 
-// Struct to implement a linked-list that holds keys 
- typedef struct {
+/* Structure to hold key, id pairs for nodes */
+ struct list_node{
     int key;
     union {
         PageId pid;
-        RecordId rid;
-    } u;
- } node;
+        RecordId sid;
+    } id;
+    list_node* next;
+};
 
-// List struct to hold list of key, pid pairs
- typedef struct {
-    int count;
-    node* next;
- } list;
+typedef struct list_node list_node;
+
+
+/* N for B+ Tree */
+#define N PageFile::PAGE_SIZE/sizeof(list_node)
 
 /**
  * BTLeafNode: The class representing a B+tree leaf node.
  */
 class BTLeafNode {
   public:
+   /**
+    * Constructor for class BTLeafNode
+    */
+    BTLeafNode();
+
    /**
     * Insert the (key, rid) pair to the node.
     * Remember that all keys inside a B+tree node should be kept sorted.
@@ -117,6 +123,16 @@ class BTLeafNode {
     * that contains the node.
     */
     char buffer[PageFile::PAGE_SIZE];
+
+    /**
+    * Linked list that holds the list of keys stored in the node
+    */
+    list_node* list;
+
+    /**
+    * Counter to track the number of keys currently in node
+    */
+    int count;
 }; 
 
 
@@ -125,6 +141,11 @@ class BTLeafNode {
  */
 class BTNonLeafNode {
   public:
+   /**
+    * Constructor for class BTLeafNode
+    */
+    BTNonLeafNode();
+
    /**
     * Insert a (key, pid) pair to the node.
     * Remember that all keys inside a B+tree node should be kept sorted.
@@ -189,6 +210,9 @@ class BTNonLeafNode {
     */
     RC write(PageId pid, PageFile& pf);
 
+    //inline list_node* getlist() {return list;};
+    list_node* list;
+
   private:
    /**
     * The main memory buffer for loading the content of the disk page 
@@ -199,7 +223,13 @@ class BTNonLeafNode {
    /**
     * Linked list that holds the list of keys stored in the node
     */
-    list key_list;
+    
+
+    /**
+    * Counter to track the number of keys currently in node
+    */
+    int count;
+
 
 }; 
 

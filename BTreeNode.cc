@@ -25,7 +25,7 @@ RC BTLeafNode::write(PageId pid, PageFile& pf)
  * @return the number of keys in the node
  */
 int BTLeafNode::getKeyCount()
-{ return 0; }
+{ return count; }
 
 /*
  * Insert a (key, rid) pair to the node.
@@ -87,6 +87,16 @@ RC BTLeafNode::setNextNodePtr(PageId pid)
 { return 0; }
 
 /*
+ * Initialize the fields to appropriate zero values *
+ */
+BTNonLeafNode::BTNonLeafNode()
+{
+	count = 0;
+	list = NULL;
+
+}
+
+/*
  * Read the content of the node from the page pid in the PageFile pf.
  * @param pid[IN] the PageId to read
  * @param pf[IN] PageFile to read from
@@ -117,7 +127,7 @@ RC BTNonLeafNode::write(PageId pid, PageFile& pf)
  * @return the number of keys in the node
  */
 int BTNonLeafNode::getKeyCount()
-{ return 0; }
+{ return count; }
 
 
 /*
@@ -128,12 +138,35 @@ int BTNonLeafNode::getKeyCount()
  */
 RC BTNonLeafNode::insert(int key, PageId pid)
 { 
+	/* Check if node is full */
+	if(count > N-2)
+		return RC_NODE_FULL;
+
+	list_node* temp = new list_node;
+	temp->key = key;
+	temp->id.pid = pid;
+
+	list_node* curr = list;
+	while(curr != NULL)
+	{
+
+		if(curr->next = NULL)
+			break;
+
+		curr = curr->next;
+	}
+
+	if(curr == NULL)
+		list = temp;
+
+	else curr->next = temp; 
+
+	count++;
+	
 	return 0;
 
-
-
-
 }
+
 
 /*
  * Insert the (key, pid) pair to the node
