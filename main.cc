@@ -23,10 +23,21 @@ int main()
 
 
 BTNonLeafNode node;
+node.insert(10,0);
+node.insert(5,1);
+node.insert(1,2);
 node.insert(0,0);
-cout << node.getKeyCount() << endl;
-cout << node.list->key << endl;
-cout << node.list->id.pid << endl;
+
+list_node* curr = node.list;
+while(curr != NULL){
+//cout << node.getKeyCount() << endl;
+cout << curr->key << endl;
+//cout << curr->id.pid << endl;
+cout << endl;
+curr = curr->next;
+}
+
+
 
   return 0;
 }

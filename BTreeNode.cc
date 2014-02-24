@@ -146,24 +146,45 @@ RC BTNonLeafNode::insert(int key, PageId pid)
 	temp->key = key;
 	temp->id.pid = pid;
 
-	list_node* curr = list;
-	while(curr != NULL)
-	{
+	if(list == NULL)
+		{
+			list = temp;
+		}
 
-		if(curr->next = NULL)
-			break;
+	else {
+		list_node* curr = list;
 
-		curr = curr->next;
+		if(list->key > temp->key)
+		{
+			temp->next = curr;
+			list = temp;
+		}
+
+		else {
+		while(curr)
+		{
+			if(!curr->next)
+				{
+					curr->next = temp;
+					break;
+				}
+
+			if(curr->next->key > temp->key)
+			{
+				temp->next = curr->next;
+				curr->next = temp;
+				break;
+			}
+
+			curr = curr->next;
+
+		}
+
+	}
+		
 	}
 
-	if(curr == NULL)
-		list = temp;
-
-	else curr->next = temp; 
-
 	count++;
-	
-	return 0;
 
 }
 
