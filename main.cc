@@ -23,7 +23,7 @@ int main()
 
 
 BTLeafNode node;
-BTNonLeafNode sib;
+BTLeafNode sib;
 /*
 node.insert(10,0);
 node.insert(5,1);
@@ -58,7 +58,7 @@ node.insert(9,rid);
 node.insert(6,rid);
 
  // *Troll Face* //
-//node.insertAndSplit(2,2,sib,mid);
+node.insertAndSplit(2,rid,sib,mid);
 list_node* curr = node.list;
 cout << "THIS" <<endl;
 cout << node.getKeyCount() << endl;
@@ -70,21 +70,20 @@ curr = curr->next;
 }
 
 
-//cout << "mid = " << mid << endl;
+cout << "mid = " << mid << endl;
 
 
 
 
-/*cout <<endl;
+cout <<endl;
 cout << "SIB " << sib.getKeyCount() << endl;
 curr= sib.list;
 while(curr != NULL){
 cout << curr->key << endl;
-cout << curr->id.pid << endl;
 cout << endl;
 curr = curr->next;
 }
-*/
+
 
 
   return 0;

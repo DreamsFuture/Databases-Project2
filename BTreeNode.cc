@@ -113,7 +113,107 @@ RC BTLeafNode::insert(int key, const RecordId& rid)
  */
 RC BTLeafNode::insertAndSplit(int key, const RecordId& rid, 
                               BTLeafNode& sibling, int& siblingKey)
-{ return 0; }
+{ 
+	/* Check that sibling is empty */
+	if(sibling.getKeyCount() > 0)
+		return RC_NODE_FULL;
+
+
+/* Insert the given pair into this node */
+
+	list_node* temp = new list_node;
+	temp->key = key;
+	temp->id.rid = rid;
+	list_node* curr = list;
+
+	if(list == NULL)
+		{
+			list = temp;
+		}
+
+	else {
+		
+
+		if(list->key > temp->key)
+		{
+			temp->next = curr;
+			list = temp;
+		}
+
+	else {
+		while(curr)
+		{
+			if(!curr->next)
+				{
+					curr->next = temp;
+					break;
+				}
+
+			if(curr->next->key > temp->key)
+			{
+				temp->next = curr->next;
+				curr->next = temp;
+				break;
+			}
+
+			curr = curr->next;
+
+		}
+
+	}
+		
+	}
+
+/* Find the middle pair in this node */
+
+	list_node* mid = list;
+	list_node* fast = list;
+
+	while(true)
+	{
+		if(fast == NULL)
+			break;
+		if(fast->next == NULL)
+			break;
+		if(fast->next->next == NULL)
+			break;
+		fast = fast->next->next;
+		mid = mid->next;
+	}
+	
+
+siblingKey = mid->next->key;
+
+ /* Add all pairs after mid to the sibling node */
+
+	list_node* nxt = mid->next;
+	while(nxt != NULL)
+	{
+		sibling.insert(nxt->key,nxt->id.rid);
+		nxt = nxt->next;
+	}
+
+
+
+ /* Free all pairs after the middle one in the current node */
+
+	list_node* curr1 = mid->next;
+	list_node* curr2 = curr1->next;
+	while(curr1 != NULL)
+	{
+		delete curr1;
+		curr1 = curr2;
+		if(curr1 = NULL)
+			break;
+		else curr2 = curr2->next;
+
+		count--;
+	}
+
+	mid->next = NULL;
+	
+	return 0;
+}
 
 /*
  * Find the entry whose key value is larger than or equal to searchKey
