@@ -17,9 +17,54 @@ BTLeafNode::BTLeafNode()
  * @return 0 if successful. Return an error code if there is an error.
  */
 RC BTLeafNode::read(PageId pid, const PageFile& pf)
-{ 
-	  int ret = pf.read(pid,buffer);
-	  return ret;
+{
+    //check if the pid is valid
+    if(pid < 0 || pid > pf.end_pid()) return RC_INVALID_RID;
+    
+    //read into the main memory buffer (1024 bytes)
+    int ret = pf.read(pid,buffer);
+    
+    //unable to read, return same error code
+    if(ret < 0) return ret;
+    
+    char* ptr = buffer;
+    
+    memcpy(count, ptr, sizeof(count));
+    printf(count);
+    
+    ptr += sizeof(count);
+    
+    memcpy(end_pid, ptr, sizeof(end_pid));
+    ptr += sizeof(end_pid);
+    
+    list_node* curr = NULL;
+    
+    for(int i=0; i<count; i++)
+    {
+        if(i == 0)
+        {
+            //root points here
+            list = new list_node;
+            memcpy(list->rid, ptr, sizeof(RecordId));
+            ptr += sizeof(RecordId);
+            memcpy(list->key, ptr, sizeof(int));
+            ptr += sizeof(int)
+            list->next = NULL;
+            curr = list;
+        }
+        else
+        {
+            curr->next = new list_node;
+            curr = curr->next;
+            memcpy(curr->rid, ptr, sizeof(RecordId));
+            ptr += sizeof(RecordId);
+            memcpy(curr->key, ptr, sizeof(int));
+            ptr += sizeof(int);
+            curr->next = NULL:
+        }
+    }
+    
+    return 0;
 }
     
 /*
@@ -30,8 +75,12 @@ RC BTLeafNode::read(PageId pid, const PageFile& pf)
  */
 RC BTLeafNode::write(PageId pid, PageFile& pf)
 { 
- 	  int ret = pf.write(pid,buffer);
-	  return ret;
+    //check if the pid is valid
+    if(pid < 0 || pid > pf.end_pid()) return RC_INVALID_RID;
+    
+    
+    
+    return 0;
 }
 
 /*
@@ -119,7 +168,7 @@ RC BTLeafNode::insertAndSplit(int key, const RecordId& rid,
 		return RC_NODE_FULL;
 
 
-/* Insert the given pair into this node */
+    /* Insert the given pair into this node */
 
 	list_node* temp = new list_node;
 	temp->key = key;

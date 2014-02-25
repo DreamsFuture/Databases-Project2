@@ -137,7 +137,7 @@ RC SqlEngine::load(const string& table, const string& loadfile, bool index)
   ifstream fs;
   fs.open(loadfile.c_str());
   if(fs.is_open()){};
-    /*Need to figure out what to return if fopen fails */
+    /* Need to figure out what to return if fopen fails */
 
   /* Initialize RecordFile instance and open in write mode */
   string record_file_name = table + ".tbl";
