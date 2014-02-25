@@ -64,7 +64,7 @@ RC BTLeafNode::read(PageId pid, const PageFile& pf)
         {
             //create root
             list = new list_node;
-            memcpy(list->rid, ptr, sizeof(RecordId));
+            memcpy(list->id.rid, ptr, sizeof(RecordId));
             ptr += sizeof(RecordId);
             memcpy(list->key, ptr, sizeof(int));
             ptr += sizeof(int)
@@ -75,7 +75,7 @@ RC BTLeafNode::read(PageId pid, const PageFile& pf)
         {
             curr->next = new list_node;
             curr = curr->next;
-            memcpy(curr->rid, ptr, sizeof(RecordId));
+            memcpy(curr->id.rid, ptr, sizeof(RecordId));
             ptr += sizeof(RecordId);
             memcpy(curr->key, ptr, sizeof(int));
             ptr += sizeof(int);
@@ -399,9 +399,56 @@ BTNonLeafNode::~BTNonLeafNode()
  */
 RC BTNonLeafNode::read(PageId pid, const PageFile& pf)
 { 
-	  int ret = pf.read(pid,buffer);
-	  
-	  return ret;
+    //check if the pid is valid
+    if(pid < 0 || pid > pf.end_pid()) return RC_INVALID_RID;
+    
+    //read into the main memory buffer (1024 bytes)
+    int ret = pf.read(pid,buffer);
+    
+    //unable to read, return same error code
+    if(ret < 0) return ret;
+    
+    char* ptr = buffer;
+    
+    memcpy(count, ptr, sizeof(count));
+    printf(count);
+    
+    ptr += sizeof(count);
+    
+    memcpy(end_pid, ptr, sizeof(end_pid));
+    ptr += sizeof(end_pid);
+    
+    list_node* curr = NULL;
+    RecordId RID;
+    
+    for(int i=0; i<count; i++)
+    {
+        if(i == 0)
+        {
+            //create root
+            list = new list_node;
+            memcpy(RID, ptr, sizeof(RecordId));
+            list->id.pid = RID.pid;
+            ptr += sizeof(RecordId);
+            memcpy(list->key, ptr, sizeof(int));
+            ptr += sizeof(int)
+            list->next = NULL;
+            curr = list;
+        }
+        else
+        {
+            curr->next = new list_node;
+            curr = curr->next;
+            memcpy(RID, ptr, sizeof(RecordId));
+            curr->id.pid = RID.pid;
+            ptr += sizeof(RecordId);
+            memcpy(curr->key, ptr, sizeof(int));
+            ptr += sizeof(int);
+            curr->next = NULL:
+        }
+    }
+    
+    return 0;
 }
     
 /*
