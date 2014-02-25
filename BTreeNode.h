@@ -35,9 +35,10 @@ typedef struct list_node list_node;
 class BTLeafNode {
   public:
    /**
-    * Constructor for class BTLeafNode
+    * Constructor and Destructor for class BTLeafNode
     */
     BTLeafNode();
+    ~BTLeafNode();
 
    /**
     * Insert the (key, rid) pair to the node.
@@ -151,9 +152,10 @@ class BTLeafNode {
 class BTNonLeafNode {
   public:
    /**
-    * Constructor for class BTLeafNode
+    * Constructor and Destructor for class BTLeafNode
     */
     BTNonLeafNode();
+    ~BTNonLeafNode();
 
    /**
     * Insert a (key, pid) pair to the node.

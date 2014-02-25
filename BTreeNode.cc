@@ -10,6 +10,25 @@ BTLeafNode::BTLeafNode()
 	end_pid = 0;
 }
 
+/* Free all the allocated key/rid airs */
+BTLeafNode::~BTLeafNode()
+{
+	list_node* p1 = list;
+	list_node* p2;
+	if(list != NULL)
+	p2 = list->next;
+
+	while(p1 != NULL)
+	{
+		delete p1;
+		p1 = p2;
+		if(p1 = NULL)
+			break;
+		else p2 = p2->next;
+	}
+	
+}
+
 /*
  * Read the content of the node from the page pid in the PageFile pf.
  * @param pid[IN] the PageId to read
@@ -302,6 +321,25 @@ BTNonLeafNode::BTNonLeafNode()
 	list = NULL;
 	end_pid = 0;
 
+}
+
+/* Free all the allocated key/rid airs */
+BTNonLeafNode::~BTNonLeafNode()
+{
+	list_node* p1 = list;
+	list_node* p2;
+	if(list != NULL)
+	p2 = list->next;
+
+	while(p1 != NULL)
+	{
+		delete p1;
+		p1 = p2;
+		if(p1 = NULL)
+			break;
+		else p2 = p2->next;
+	}
+	
 }
 
 /*
