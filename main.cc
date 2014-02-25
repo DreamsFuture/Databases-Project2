@@ -47,11 +47,34 @@ cin >> key;
 node.locateChildPtr(key,p);
 cout << p << endl;
 */
-node.initializeRoot(6,6,6);
+//node.initializeRoot(6,6,6);
+int mid;
+node.insert(0,0);
+node.insert(1,1);
+node.insert(3,3);
+node.insert(6,9); // *Troll Face* //
+node.insertAndSplit(2,2,sib,mid);
 list_node* curr = node.list;
-
+cout << "THIS" <<endl;
+cout << node.getKeyCount() << endl;
 while(curr != NULL){
-//cout << node.getKeyCount() << endl;
+
+cout << curr->key << endl;
+cout << curr->id.pid << endl;
+cout << endl;
+curr = curr->next;
+}
+
+
+//cout << "mid = " << mid << endl;
+
+
+
+
+cout <<endl;
+cout << "SIB " << sib.getKeyCount() << endl;
+curr= sib.list;
+while(curr != NULL){
 cout << curr->key << endl;
 cout << curr->id.pid << endl;
 cout << endl;

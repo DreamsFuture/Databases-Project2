@@ -27,7 +27,7 @@ typedef struct list_node list_node;
 
 
 /* N for B+ Tree */
-#define N (PageFile::PAGE_SIZE - sizeof(int) - sizeof(PageId))/sizeof(list_node)
+#define N (PageFile::PAGE_SIZE - sizeof(int) - sizeof(PageId) - sizeof(list_node*))/sizeof(list_node)
 
 /**
  * BTLeafNode: The class representing a B+tree leaf node.

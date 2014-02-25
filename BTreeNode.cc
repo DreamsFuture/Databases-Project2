@@ -11,7 +11,6 @@ using namespace std;
 RC BTLeafNode::read(PageId pid, const PageFile& pf)
 { 
 	  int ret = pf.read(pid,buffer);
-	  
 	  return ret;
 }
     
@@ -24,7 +23,6 @@ RC BTLeafNode::read(PageId pid, const PageFile& pf)
 RC BTLeafNode::write(PageId pid, PageFile& pf)
 { 
  	  int ret = pf.write(pid,buffer);
-
 	  return ret;
 }
 
@@ -154,6 +152,7 @@ RC BTNonLeafNode::insert(int key, PageId pid)
 	list_node* temp = new list_node;
 	temp->key = key;
 	temp->id.pid = pid;
+	list_node* curr = list;
 
 	if(list == NULL)
 		{
@@ -161,7 +160,7 @@ RC BTNonLeafNode::insert(int key, PageId pid)
 		}
 
 	else {
-		list_node* curr = list;
+		
 
 		if(list->key > temp->key)
 		{
@@ -212,11 +211,18 @@ RC BTNonLeafNode::insert(int key, PageId pid)
  */
 RC BTNonLeafNode::insertAndSplit(int key, PageId pid, BTNonLeafNode& sibling, int& midKey)
 { 
+
+/* Check that sibling is empty */
+	if(sibling.getKeyCount() > 0)
+		return RC_NODE_FULL;
+
+
+/* Insert the given pair into this node */
+
 	list_node* temp = new list_node;
 	temp->key = key;
 	temp->id.pid = pid;
-
-/* Insert the given pair into this node */
+	list_node* curr = list;
 
 	if(list == NULL)
 		{
@@ -224,7 +230,7 @@ RC BTNonLeafNode::insertAndSplit(int key, PageId pid, BTNonLeafNode& sibling, in
 		}
 
 	else {
-		list_node* curr = list;
+		
 
 		if(list->key > temp->key)
 		{
@@ -261,37 +267,50 @@ RC BTNonLeafNode::insertAndSplit(int key, PageId pid, BTNonLeafNode& sibling, in
 	list_node* mid = list;
 	list_node* fast = list;
 
-	while(fast->next->next != NULL)
+	while(true)
 	{
+		if(fast == NULL)
+			break;
+		if(fast->next == NULL)
+			break;
+		if(fast->next->next == NULL)
+			break;
 		fast = fast->next->next;
 		mid = mid->next;
 	}
+	
 
-/* Add all pairs after mid to the sibling node */
+midKey = mid->key;
 
-	midKey = mid->key;
+ /* Add all pairs after mid to the sibling node */
 
-	mid = mid->next;
-	while(mid->next != NULL)
+	list_node* nxt = mid->next;
+	while(nxt != NULL)
 	{
-		sibling.insert(mid->key,mid->id.pid);
-		mid = mid->next;
-	}
-
-/* Free all pairs after the middle one in the current node */ 
-
-	list_node* curr;
-	while(mid->next != NULL)
-	{
-		curr = mid;
-		mid = mid->next;
-		delete curr;
-
+		sibling.insert(nxt->key,nxt->id.pid);
+		nxt = nxt->next;
 	}
 
 
 
+ /* Free all pairs after the middle one in the current node */
 
+	list_node* curr1 = mid->next;
+	list_node* curr2 = curr1->next;
+	while(curr1 != NULL)
+	{
+		delete curr1;
+		curr1 = curr2;
+		if(curr1 = NULL)
+			break;
+		else curr2 = curr2->next;
+
+		count--;
+	}
+
+	mid->next = NULL;
+	
+	return 0;
 
 }
 
