@@ -241,7 +241,7 @@ RC BTLeafNode::readEntry(int eid, int& key, RecordId& rid)
  * @return the PageId of the next sibling node 
  */
 PageId BTLeafNode::getNextNodePtr()
-{ return 0; }
+{ return end_pid; }
 
 /*
  * Set the pid of the next slibling node.
@@ -249,7 +249,10 @@ PageId BTLeafNode::getNextNodePtr()
  * @return 0 if successful. Return an error code if there is an error.
  */
 RC BTLeafNode::setNextNodePtr(PageId pid)
-{ return 0; }
+{ 
+	end_pid = pid;
+	return 0;
+}
 
 
 /*
