@@ -224,7 +224,25 @@ siblingKey = mid->next->key;
  * @return 0 if successful. Return an error code if there is an error.
  */
 RC BTLeafNode::locate(int searchKey, int& eid)
-{ return 0; }
+{ 
+	int num = 0;
+	list_node* curr = list;
+	while(curr->key < searchKey)
+	{
+		if(curr->next == NULL)
+		{
+			return RC_NO_SUCH_RECORD;
+		}
+
+		curr = curr->next;
+		num++;
+	}
+
+	eid = num;
+
+	return 0; 
+
+}
 
 /*
  * Read the (key, rid) pair from the eid entry.
@@ -234,7 +252,27 @@ RC BTLeafNode::locate(int searchKey, int& eid)
  * @return 0 if successful. Return an error code if there is an error.
  */
 RC BTLeafNode::readEntry(int eid, int& key, RecordId& rid)
-{ return 0; }
+{ 
+	if(eid < 0)
+		return RC_NO_SUCH_RECORD;
+
+	list_node* curr = list;
+	int num = 0;
+	while(curr != NULL && num < eid)
+	{
+		curr = curr->next;
+		num++;
+	}
+
+	if(curr == NULL)
+		return RC_NO_SUCH_RECORD;
+
+	key = curr->key;
+	rid = curr->id.rid;
+
+	return 0;
+
+}
 
 /*
  * Return the pid of the next slibling node.

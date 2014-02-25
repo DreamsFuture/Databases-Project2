@@ -52,13 +52,13 @@ int mid;
 RecordId rid;
 rid.pid = 0;
 rid.sid = 0;
-node.insert(0,rid);
+node.insert(2,rid);
 node.insert(1,rid);
 node.insert(9,rid);
 node.insert(6,rid);
 
  // *Troll Face* //
-node.insertAndSplit(2,rid,sib,mid);
+/*node.insertAndSplit(2,rid,sib,mid);
 list_node* curr = node.list;
 cout << "THIS" <<endl;
 cout << node.getKeyCount() << endl;
@@ -84,6 +84,11 @@ cout << endl;
 curr = curr->next;
 }
 
+*/
+
+int key;
+cout << node.readEntry(0,key,rid) << endl;
+cout << key << endl;
 
 
   return 0;
