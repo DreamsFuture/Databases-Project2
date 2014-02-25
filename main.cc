@@ -22,14 +22,15 @@ int main()
 //  SqlEngine::run(stdin);
 
 
-BTLeafNode node;
+BTNonLeafNode node;
 BTLeafNode sib;
-/*
+BTNonLeafNode test;
+
 node.insert(10,0);
 node.insert(5,1);
 node.insert(1,2);
 node.insert(0,0);
-*/
+
 
 /*list_node* curr = node.list;
 while(curr != NULL){
@@ -48,7 +49,7 @@ node.locateChildPtr(key,p);
 cout << p << endl;
 */
 //node.initializeRoot(6,6,6);
-int mid;
+/*int mid;
 RecordId rid;
 rid.pid = 0;
 rid.sid = 0;
@@ -56,9 +57,7 @@ node.insert(2,rid);
 node.insert(1,rid);
 node.insert(9,rid);
 node.insert(6,rid);
-
- // *Troll Face* //
-/*node.insertAndSplit(2,rid,sib,mid);
+*/
 list_node* curr = node.list;
 cout << "THIS" <<endl;
 cout << node.getKeyCount() << endl;
@@ -70,7 +69,7 @@ curr = curr->next;
 }
 
 
-cout << "mid = " << mid << endl;
+/*cout << "mid = " << mid << endl;
 
 
 
@@ -83,13 +82,7 @@ cout << curr->key << endl;
 cout << endl;
 curr = curr->next;
 }
-
 */
-
-int key;
-cout << node.readEntry(0,key,rid) << endl;
-cout << key << endl;
-
 
   return 0;
 }
