@@ -2,6 +2,14 @@
 
 using namespace std;
 
+/* Initialize fields to appropriate 0 values */
+BTLeafNode::BTLeafNode()
+{
+	count = 0;
+	list = NULL;
+	end_pid = 0;
+}
+
 /*
  * Read the content of the node from the page pid in the PageFile pf.
  * @param pid[IN] the PageId to read
@@ -40,7 +48,58 @@ int BTLeafNode::getKeyCount()
  * @return 0 if successful. Return an error code if the node is full.
  */
 RC BTLeafNode::insert(int key, const RecordId& rid)
-{ return 0; }
+{ 
+	
+	if(count > N-2)
+		return RC_NODE_FULL;
+
+	list_node* temp = new list_node;
+	temp->key = key;
+	temp->id.rid = rid;
+	list_node* curr = list;
+
+	if(list == NULL)
+		{
+			list = temp;
+		}
+
+	else {
+		
+
+		if(list->key > temp->key)
+		{
+			temp->next = curr;
+			list = temp;
+		}
+
+	else {
+		while(curr)
+		{
+			if(!curr->next)
+				{
+					curr->next = temp;
+					break;
+				}
+
+			if(curr->next->key > temp->key)
+			{
+				temp->next = curr->next;
+				curr->next = temp;
+				break;
+			}
+
+			curr = curr->next;
+
+		}
+
+	}
+		
+	}
+
+	count++;
+
+	return 0;
+ }
 
 /*
  * Insert the (key, rid) pair to the node
@@ -91,6 +150,7 @@ PageId BTLeafNode::getNextNodePtr()
  */
 RC BTLeafNode::setNextNodePtr(PageId pid)
 { return 0; }
+
 
 /*
  * Initialize the fields to appropriate zero values *

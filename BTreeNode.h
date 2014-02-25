@@ -18,7 +18,7 @@
     int key;
     union {
         PageId pid;
-        RecordId sid;
+        RecordId rid;
     } id;
     list_node* next;
 };
