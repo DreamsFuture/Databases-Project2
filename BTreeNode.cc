@@ -53,8 +53,8 @@ RC BTLeafNode::read(PageId pid, const PageFile& pf)
     
     ptr += sizeof(count);
     
-    memcpy(end_pid, ptr, sizeof(end_pid));
-    ptr += sizeof(end_pid);
+    memcpy(end_pid, ptr, sizeof(PageId));
+    ptr += sizeof(PageId);
     
     list_node* curr = NULL;
     
@@ -97,7 +97,30 @@ RC BTLeafNode::write(PageId pid, PageFile& pf)
     //check if the pid is valid
     if(pid < 0 || pid > pf.end_pid()) return RC_INVALID_RID;
     
+    //initialize the buffer to be all zeros before writing list
+    memset(buffer, 0, PageFile::PAGE_SIZE);
     
+    char* ptr = buffer;
+    
+    memcpy(ptr, count, sizeof(int));
+    ptr += sizeof(int);
+    memcpy(ptr, end_pid, sizeof(PageId));
+    ptr += sizeof(PageId);
+    
+    list_node* curr = list;
+    
+    while(curr != NULL)
+    {
+        memcpy(ptr, curr->id.rid, sizeof(RecordId));
+        ptr += sizeof(RecordId);
+        memcpy(ptr, curr->key, sizeof(int));
+        ptr += sizeof(int);
+        curr = curr->next;
+    }
+    
+    //if we are unable to write the buffer, return same write error code
+    RC ret;
+    if( (ret = pf.write(pid, buffer)) <0) return ret;
     
     return 0;
 }
@@ -403,7 +426,7 @@ RC BTNonLeafNode::read(PageId pid, const PageFile& pf)
     if(pid < 0 || pid > pf.end_pid()) return RC_INVALID_RID;
     
     //read into the main memory buffer (1024 bytes)
-    int ret = pf.read(pid,buffer);
+    RC ret = pf.read(pid,buffer);
     
     //unable to read, return same error code
     if(ret < 0) return ret;
@@ -459,9 +482,38 @@ RC BTNonLeafNode::read(PageId pid, const PageFile& pf)
  */
 RC BTNonLeafNode::write(PageId pid, PageFile& pf)
 { 
-	  int ret = pf.write(pid,buffer);
-
-	  return ret;
+    //check if the pid is valid
+    if(pid < 0 || pid > pf.end_pid()) return RC_INVALID_RID;
+    
+    char* ptr = buffer;
+    
+    //initialize buffer to be all zeros before we write in the linked list data
+    memset(ptr, 0, PageFile::PAGE_SIZE);
+    
+    memcpy(ptr, count, sizeof(int));
+    ptr += sizeof(int);
+    memcpy(ptr, end_pid, sizeof(PageId));
+    ptr += sizeof(PageId);
+    
+    list_node* curr = list;
+    RecordId RID;
+    
+    while(curr != NULL)
+    {
+        RID.pid = curr->id.pid;
+        RID.sid = 0; //this doesn't matter it wont be read for nonLeafNodes
+        memcpy(ptr, curr->id.rid, sizeof(RecordId));
+        ptr += sizeof(RecordId);
+        memcpy(ptr, curr->key, sizeof(int));
+        ptr += sizeof(int);
+        curr = curr->next;
+    }
+    
+    //if we are unable to write the buffer, return same write error code
+    RC ret;
+    if( (ret = pf.write(pid, buffer)) <0) return ret;
+    
+    return 0;
 }
 
 /*
