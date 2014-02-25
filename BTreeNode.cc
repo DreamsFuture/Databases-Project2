@@ -62,7 +62,7 @@ RC BTLeafNode::read(PageId pid, const PageFile& pf)
     {
         if(i == 0)
         {
-            //root points here
+            //create root
             list = new list_node;
             memcpy(list->rid, ptr, sizeof(RecordId));
             ptr += sizeof(RecordId);
