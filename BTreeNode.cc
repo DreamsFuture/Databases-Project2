@@ -450,7 +450,7 @@ RC BTNonLeafNode::read(PageId pid, const PageFile& pf)
     ptr += sizeof(end_pid);
     
     list_node* curr = NULL;
-    RecordId* RID;
+    RecordId RID;
     
     for(int i=0; i<count; i++)
     {
@@ -458,8 +458,8 @@ RC BTNonLeafNode::read(PageId pid, const PageFile& pf)
         {
             //create root
             list = new list_node;
-            memcpy(RID, ptr, sizeof(RecordId));
-            list->id.pid = RID->pid;
+            memcpy(&RID, ptr, sizeof(RecordId));
+            list->id.pid = RID.pid;
             ptr += sizeof(RecordId);
             memcpy(&list->key, ptr, sizeof(int));
             ptr += sizeof(int);
@@ -470,8 +470,8 @@ RC BTNonLeafNode::read(PageId pid, const PageFile& pf)
         {
             curr->next = new list_node;
             curr = curr->next;
-            memcpy(RID, ptr, sizeof(RecordId));
-            curr->id.pid = RID->pid;
+            memcpy(&RID, ptr, sizeof(RecordId));
+            curr->id.pid = RID.pid;
             ptr += sizeof(RecordId);
             memcpy(&curr->key, ptr, sizeof(int));
             ptr += sizeof(int);

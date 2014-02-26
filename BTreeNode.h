@@ -231,6 +231,7 @@ class BTNonLeafNode {
 
     list_node* list;
     char buffer[PageFile::PAGE_SIZE];
+    int count;
 
   private:
    /**
@@ -246,7 +247,7 @@ class BTNonLeafNode {
     /**
     * Counter to track the number of keys currently in node
     */
-    int count;
+    
 
     /**
      * Pid that points to the node that holds keys greater than all the keys in this node.

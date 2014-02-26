@@ -23,10 +23,10 @@ int main()
 //  SqlEngine::run(stdin);
 
 
-BTLeafNode node;
+BTNonLeafNode node;
 BTLeafNode sib;
-BTLeafNode test;
-RecordId rid;
+BTNonLeafNode test;
+PageId rid = 0;
 node.insert(10,rid);
 node.insert(5,rid);
 node.insert(1,rid);
