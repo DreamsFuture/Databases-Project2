@@ -23,17 +23,24 @@ int main()
 //  SqlEngine::run(stdin);
 
 
-BTNonLeafNode node;
+BTLeafNode node;
 BTLeafNode sib;
-BTNonLeafNode test;
+BTLeafNode test;
+RecordId rid;
+node.insert(10,rid);
+node.insert(5,rid);
+node.insert(1,rid);
+node.insert(0,rid);
 
-node.insert(10,0);
-node.insert(5,1);
-node.insert(1,2);
-node.insert(0,0);
+PageFile pf;
+pf.open("a",'w');
+node.write(1,pf);
+test.read(1,pf);
 
 
-/*list_node* curr = node.list;
+list_node* curr = test.list;
+
+cout << test.count;
 while(curr != NULL){
 //cout << node.getKeyCount() << endl;
 cout << curr->key << endl;
@@ -41,7 +48,7 @@ cout << curr->key << endl;
 cout << endl;
 curr = curr->next;
 }
-*/
+
 /*
 PageId p;
 int key;
@@ -69,7 +76,7 @@ node.insert(6,rid);
 //curr = curr->next;
 //}
     
-    char testbuff[1024];
+  /*  char testbuff[1024];
     int count = 2;
     int key1 = 3;
     int key2 = 7;
@@ -93,14 +100,20 @@ node.insert(6,rid);
     
     ///Dont know how to make this a PageFile that I can pass to BTLeafNode to READ
     BTLeafNode node;
+
+    */
     
 
 /*cout << "mid = " << mid << endl;
 
+*/
 
 
 
-cout <<endl;
+
+
+
+/*cout <<endl;
 cout << "SIB " << sib.getKeyCount() << endl;
 curr= sib.list;
 while(curr != NULL){
