@@ -124,9 +124,9 @@ class BTLeafNode {
     RC write(PageId pid, PageFile& pf);
 
 
-    list_node* list;
-    char buffer[PageFile::PAGE_SIZE];
-    int count;
+    
+    
+    
 
     
   private:
@@ -134,16 +134,17 @@ class BTLeafNode {
     * The main memory buffer for loading the content of the disk page 
     * that contains the node.
     */
-    
+    char buffer[PageFile::PAGE_SIZE];
 
    /**
     * Linked list that holds the list of keys stored in the node
     */
+    list_node* list;
 
     /**
     * Counter to track the number of keys currently in node
     */
-    
+    int count;
 
     /**
      * Pid that points to the node that holds keys greater than all the keys in this node.
@@ -229,25 +230,26 @@ class BTNonLeafNode {
     RC write(PageId pid, PageFile& pf);
 
 
-    list_node* list;
-    char buffer[PageFile::PAGE_SIZE];
-    int count;
+    
+    
+    
 
   private:
    /**
     * The main memory buffer for loading the content of the disk page 
     * that contains the node.
     */
-    
+    char buffer[PageFile::PAGE_SIZE];
    
    /**
     * Linked list that holds the list of keys stored in the node
     */
+    list_node* list;
 
     /**
     * Counter to track the number of keys currently in node
     */
-    
+    int count;
 
     /**
      * Pid that points to the node that holds keys greater than all the keys in this node.
