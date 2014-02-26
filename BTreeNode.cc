@@ -53,7 +53,7 @@ RC BTLeafNode::read(PageId pid, const PageFile& pf)
     
     ptr += sizeof(count);
     
-    memcpy(&end_pid, ptr, sizeof(end_pid));
+    memcpy(&end_pid, reinterpret_cast<int*>(ptr), sizeof(end_pid));
     ptr += sizeof(end_pid);
 
     
@@ -67,7 +67,7 @@ RC BTLeafNode::read(PageId pid, const PageFile& pf)
             list = new list_node;
             memcpy(&list->id.rid, ptr, sizeof(RecordId));
             ptr += sizeof(RecordId);
-            memcpy(&list->key, ptr, sizeof(int));
+            memcpy(&list->key, reinterpret_cast<int*>(ptr), sizeof(int));
             ptr += sizeof(int);
             list->next = NULL;
             curr = list;
@@ -78,7 +78,7 @@ RC BTLeafNode::read(PageId pid, const PageFile& pf)
             curr = curr->next;
             memcpy(&curr->id.rid, ptr, sizeof(RecordId));
             ptr += sizeof(RecordId);
-            memcpy(&curr->key, ptr, sizeof(int));
+            memcpy(&curr->key, reinterpret_cast<int*>(ptr), sizeof(int));
             ptr += sizeof(int);
             curr->next = NULL;
         }
@@ -441,12 +441,12 @@ RC BTNonLeafNode::read(PageId pid, const PageFile& pf)
     
     char* ptr = buffer;
     
-    memcpy(&count, ptr, sizeof(count));
+    memcpy(&count, reinterpret_cast<int*>(ptr), sizeof(count));
     //printf(count);
     
     ptr += sizeof(count);
     
-    memcpy(&end_pid, ptr, sizeof(end_pid));
+    memcpy(&end_pid, reinterpret_cast<int*>(ptr), sizeof(end_pid));
     ptr += sizeof(end_pid);
     
     list_node* curr = NULL;
@@ -461,7 +461,7 @@ RC BTNonLeafNode::read(PageId pid, const PageFile& pf)
             memcpy(&RID, ptr, sizeof(RecordId));
             list->id.pid = RID.pid;
             ptr += sizeof(RecordId);
-            memcpy(&list->key, ptr, sizeof(int));
+            memcpy(&list->key, reinterpret_cast<int*>(ptr), sizeof(int));
             ptr += sizeof(int);
             list->next = NULL;
             curr = list;
@@ -473,7 +473,7 @@ RC BTNonLeafNode::read(PageId pid, const PageFile& pf)
             memcpy(&RID, ptr, sizeof(RecordId));
             curr->id.pid = RID.pid;
             ptr += sizeof(RecordId);
-            memcpy(&curr->key, ptr, sizeof(int));
+            memcpy(&curr->key, reinterpret_cast<int*>(ptr), sizeof(int));
             ptr += sizeof(int);
             curr->next = NULL;
         }

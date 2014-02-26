@@ -24,23 +24,26 @@ int main()
 
 
 BTNonLeafNode node;
-BTLeafNode sib;
+BTNonLeafNode sib;
 BTNonLeafNode test;
-PageId rid = 0;
+PageId rid =0;
 node.insert(10,rid);
 node.insert(5,rid);
 node.insert(1,rid);
 node.insert(0,rid);
 
 PageFile pf;
-pf.open("a",'w');
-node.write(1,pf);
-test.read(1,pf);
+pf.open("b",'w');
+cout << node.write(0,pf) << endl;
+test.read(0,pf);
+
+
+
 
 
 list_node* curr = test.list;
 
-cout << test.count;
+cout << test.count << endl;
 while(curr != NULL){
 //cout << node.getKeyCount() << endl;
 cout << curr->key << endl;
@@ -48,6 +51,7 @@ cout << curr->key << endl;
 cout << endl;
 curr = curr->next;
 }
+
 
 /*
 PageId p;
