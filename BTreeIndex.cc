@@ -78,10 +78,16 @@ RC BTreeIndex::insert(int key, const RecordId& rid)
 RC BTreeIndex::locate(int searchKey, IndexCursor& cursor)
 {
     RC ret;
-    BTLeafNode currNodeLeaf;
-    BTNonLeafNode currNodeNonLeaf;
+    if(cursor.pid < 0 || cursor.edi < 0)
+    {
+        //reset recursion variables
+        currHeight = 0;
+        currPid = rootPid;
+        return RC_IVALID_CURSOR;
+    }
     if(currHeight < treeHeight)
     {
+        BTNonLeafNode currNodeNonLeaf;
         ret = currNodeNonLeaf.read(currPid, pf);
         if(ret < 0)
         {
@@ -103,6 +109,7 @@ RC BTreeIndex::locate(int searchKey, IndexCursor& cursor)
     }
     else //we are at the leaf node
     {
+        BTLeafNode currNodeLeaf;
         ret = currNodeLeaf.read(currPid, pf);
         if(ret < 0)
         {
@@ -144,5 +151,21 @@ RC BTreeIndex::locate(int searchKey, IndexCursor& cursor)
  */
 RC BTreeIndex::readForward(IndexCursor& cursor, int& key, RecordId& rid)
 {
+    BTLeafNode node;
+    RC ret;
+    ret = node.read(cursor.pid, pf);
+    if(ret < 0) return ret;
+    ret = node.readEntry(cursor.eid, key, rid);
+    if(ret < 0) return ret;
+    if(cursor.eid + 1 >= node.getKeyCount())
+    {
+        cursor.pid = node.getNextNodePtr();
+        //TODO: when to return the return code for reaching the end of the tree
+        cursor.eid = 0;
+    }
+    else
+    {
+        cursor.eid = cursor.eid + 1;
+    }
     return 0;
 }
