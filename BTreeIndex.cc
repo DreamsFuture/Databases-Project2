@@ -18,6 +18,9 @@ using namespace std;
 BTreeIndex::BTreeIndex()
 {
     rootPid = -1;
+    currPid = -1;
+    currHeight = 0;
+    treeHeight = -1;
 }
 
 /*
@@ -49,6 +52,7 @@ RC BTreeIndex::close()
  */
 RC BTreeIndex::insert(int key, const RecordId& rid)
 {
+    //WHEN CHANGE rootPid, CHANDE currPid to be equal
     return 0;
 }
 
@@ -73,7 +77,61 @@ RC BTreeIndex::insert(int key, const RecordId& rid)
  */
 RC BTreeIndex::locate(int searchKey, IndexCursor& cursor)
 {
-    return 0;
+    RC ret;
+    BTLeafNode currNodeLeaf;
+    BTNonLeafNode currNodeNonLeaf;
+    if(currHeight < treeHeight)
+    {
+        ret = currNodeNonLeaf.read(currPid, pf);
+        if(ret < 0)
+        {
+            //reset recursion variables
+            currHeight = 0;
+            currPid = rootPid;
+            return ret;
+        }
+        ret = currNodeNonLeaf.locateChildPtr(searchKey, currPid);
+        if(ret < 0)
+        {
+            //reset recursion variables
+            currHeight = 0;
+            currPid = rootPid;
+            return ret;
+        }
+        currHeight++;
+        BTreeIndex::locate(searchKey, cursor);
+    }
+    else //we are at the leaf node
+    {
+        ret = currNodeLeaf.read(currPid, pf);
+        if(ret < 0)
+        {
+            //reset recursion variables
+            currHeight = 0;
+            currPid = rootPid;
+            return ret;
+        }
+        int eid;
+        currNodeLeaf.locate(searchKey,eid);
+        if(ret < 0)
+        {
+            //reset recursion variables
+            currHeight = 0;
+            currPid = rootPid;
+            return ret;
+        }
+        else
+        {
+            cursor.pid = currPid;
+            cursor.eid = eid;
+            //reset recursion variables
+            currHeight = 0;
+            currPid = rootPid;
+            return 0;
+        }
+    }
+    
+    
 }
 
 /*
