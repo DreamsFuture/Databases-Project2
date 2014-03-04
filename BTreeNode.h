@@ -229,7 +229,7 @@ class BTNonLeafNode {
     */
     RC write(PageId pid, PageFile& pf);
 
-
+    RC setEndPid(PageId pid);
     
     
     
