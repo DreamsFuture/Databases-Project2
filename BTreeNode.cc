@@ -22,7 +22,7 @@ BTLeafNode::~BTLeafNode()
 	{
 		delete p1;
 		p1 = p2;
-		if(p1 = NULL)
+		if(p1 == NULL)
 			break;
 		else p2 = p2->next;
 	}
@@ -302,7 +302,7 @@ siblingKey = mid->next->key;
 	{
 		delete curr1;
 		curr1 = curr2;
-		if(curr1 = NULL)
+		if(curr1 == NULL)
 			break;
 		else curr2 = curr2->next;
 
@@ -758,4 +758,5 @@ RC BTNonLeafNode::initializeRoot(PageId pid1, int key, PageId pid2)
 RC BTNonLeafNode::setEndPid(PageId pid)
 {
 	end_pid = pid;
+    return 0;
 }
