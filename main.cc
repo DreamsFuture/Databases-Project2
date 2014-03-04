@@ -12,7 +12,7 @@
 
 //Modified
 #include <iostream>
-#include "BTreeNode.h"
+#include "BTreeIndex.h"
 #include "PageFile.h"
  using namespace std;
 
@@ -126,7 +126,5 @@ cout << endl;
 curr = curr->next;
 }
 */
-  
 
-  return 0;
 }

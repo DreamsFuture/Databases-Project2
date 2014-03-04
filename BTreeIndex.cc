@@ -20,7 +20,7 @@ BTreeIndex::BTreeIndex()
     rootPid = 0;
     currPid = 0;
     currHeight = 0;
-    treeHeight = -1;
+    treeHeight = 0;
 }
 
 /*
@@ -92,18 +92,32 @@ RC BTreeIndex::insert(int key, const RecordId& rid)
                  rootPid = newRootId;
                  currPid = newRootId;
 
+                 return 0;
+
             }
 
-
-            
+            else return 0;
 
     }
 
+    else {  /* The tree has at least two levels */
 
+            std::vector<PageId> path;
+            findInsertLeaf(path,key);  /* Find the leaf to insert into */
 
+            BTLeafNode leaf;
+            leaf.read(*(path.end() - 1),pf); /* Last node on the path is the leaf */
+            
+            int ret = leaf.insert(key,rid); /* Attempt to insert into this leaf */
 
+            if(ret == RC_NODE_FULL)
+            {
+                // Insert while handling overflow for leaf and successive parents
+            }
 
+            else return 0; /* There was no overflow */
 
+    }
 
 
 
@@ -223,4 +237,26 @@ RC BTreeIndex::readForward(IndexCursor& cursor, int& key, RecordId& rid)
         cursor.eid = cursor.eid + 1;
     }
     return 0;
+}
+
+RC BTreeIndex::findInsertLeaf(std::vector<PageId>& path, int searchKey)
+{
+    BTNonLeafNode curr;
+    curr.read(rootPid,pf);
+    path.push_back(rootPid);
+    PageId next;
+    curr.locateChildPtr(searchKey,next);
+    int currHeight = 1;
+
+    while(currHeight < treeHeight - 1)
+    {
+        curr.read(next,pf);
+        path.push_back(next);
+        curr.locateChildPtr(searchKey,next);
+        currHeight++;
+    }
+
+    path.push_back(next);
+    return 0;
+
 }
