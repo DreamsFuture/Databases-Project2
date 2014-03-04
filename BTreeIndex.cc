@@ -160,7 +160,7 @@ RC BTreeIndex::locate(int searchKey, IndexCursor& cursor)
             return ret;
         }
         currHeight++;
-        BTreeIndex::locate(searchKey, cursor);
+        return BTreeIndex::locate(searchKey, cursor);
     }
     else //we are at the leaf node
     {
