@@ -415,7 +415,7 @@ BTNonLeafNode::~BTNonLeafNode()
 	{
 		delete p1;
 		p1 = p2;
-		if(p1 = NULL)
+		if(p1 == NULL)
 			break;
 		else p2 = p2->next;
 	}

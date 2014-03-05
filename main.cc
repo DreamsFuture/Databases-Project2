@@ -20,7 +20,7 @@
 int main()
 {
   // run the SQL engine taking user commands from standard input (console).
-  SqlEngine::run(stdin);
+ // SqlEngine::run(stdin);
 
 
 /* BTNonLeafNode node;
@@ -110,13 +110,6 @@ node.insert(6,rid);
 
  cout << "mid = " << mid << endl;
 
-  
-
-
-
-
-
-
  cout <<endl;
 cout << "SIB " << sib.getKeyCount() << endl;
 curr= sib.list;
@@ -126,5 +119,14 @@ cout << endl;
 curr = curr->next;
 }
 */
+
+
+BTreeIndex test;
+RecordId rid; 
+test.insert(5,rid);
+
+
+
+
 
 }
