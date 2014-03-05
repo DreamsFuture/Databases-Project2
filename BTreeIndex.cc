@@ -32,6 +32,18 @@ BTreeIndex::BTreeIndex()
  */
 RC BTreeIndex::open(const string& indexname, char mode)
 {
+    pf.open(indexname,mode);
+    char buffer[1024];
+    char* ptr = buffer;
+    pf.read(pf.endPid()-1, buffer); 
+
+    memcpy(&rootPid, reinterpret_cast<int*>(ptr), sizeof(int));  // Read in rootPid that will be stored in last pageId
+
+    ptr += sizeof(int);
+    memcpy(&treeHeight,reinterpret_cast<int*>(ptr), sizeof(int));  // Read in treeHeight that will be stored in last pageId
+
+    currPid = rootPid;  // Set currPid equal to rootPid
+
     return 0;
 }
 
@@ -41,6 +53,17 @@ RC BTreeIndex::open(const string& indexname, char mode)
  */
 RC BTreeIndex::close()
 {
+    char buffer[1024];
+    char * ptr = buffer;
+
+    memcpy(ptr,reinterpret_cast<char*>(&rootPid),sizeof(int));   // Save rootPid to last page
+
+    ptr += sizeof(int);
+
+    memcpy(ptr,reinterpret_cast<char*>(&treeHeight),sizeof(int));  // Save treeHeight to last page
+
+    pf.write(pf.endPid(),buffer);
+    pf.close();
     return 0;
 }
 
@@ -112,7 +135,10 @@ RC BTreeIndex::insert(int key, const RecordId& rid)
 
             if(ret == RC_NODE_FULL)
             {
-                // Insert while handling overflow for leaf and successive parents
+               
+
+
+                
             }
 
             else return 0; /* There was no overflow */
