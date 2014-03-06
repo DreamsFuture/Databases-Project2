@@ -135,7 +135,23 @@ RC BTreeIndex::insert(int key, const RecordId& rid)
 
             if(ret == RC_NODE_FULL)
             {
-               
+                BTLeafNode sibling;
+                int sibKey;
+                leaf.insertAndSplit(key,rid,sibling,sibKey);  // Split leaf
+
+                sibling.write(pf.endPid(),pf);
+                leaf.setNextNodePtr(pf.endPid()-1);    // Connect leaf to new sibling
+
+                path.pop_back();  // Delete leaf from path
+
+                BTNonLeafNode parent;
+                parent.read(*(path.end()-1),pf);  // Get parent of leaf
+
+                while(parent.insert(sibKey,pf.endPid()-1) == RC_NODE_FULL)
+                {
+                    int midKey;
+                    parent.insertAndSplit(sibKey,pf.endPid()-1)
+                }
 
 
                 
