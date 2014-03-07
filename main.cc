@@ -123,10 +123,8 @@ curr = curr->next;
 
 BTreeIndex test;
 RecordId rid; 
-test.insert(5,rid);
-
-
-
-
-
+cout << test.insert(5,rid);
+cout << test.insert(6,rid);
+cout << test.insert(7,rid);
+cout << test.insert(8,rid) << endl;
 }
