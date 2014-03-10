@@ -12,7 +12,7 @@
 
 //Modified
 #include <iostream>
-#include "BTreeIndex.h"
+#include "BTreeNode.h"
 #include "PageFile.h"
  using namespace std;
 
@@ -23,108 +23,62 @@ int main()
  // SqlEngine::run(stdin);
 
 
-/* BTNonLeafNode node;
-BTNonLeafNode sib;
-BTNonLeafNode test;
-PageId rid =0;
-node.insert(10,rid);
-node.insert(5,rid);
-node.insert(1,rid);
-node.insert(0,rid);
+BTLeafNode a,b;
 
-PageFile pf;
-pf.open("b",'w');
-cout << node.write(0,pf) << endl;
-test.read(0,pf);
+/* TEST : BTNonLeafNode::Insert with swap; 
 
+    // Insert at end
+    a.setEndPid(6);
+    a.insert(0,1,false);
+    a.insert(1,2,false);
+    a.insert(2,3,false);
+    a.insert(3,4,false);
 
+    int mid;
 
+    a.insertAndSplit(4,5,b,mid,false);
 
 
-list_node* curr = test.list;
+    list_node* curr = b.list;
+    while(curr != NULL)
+    {
+        cout << curr->key << endl;
+        curr = curr->next;
+    }
 
-cout << test.count << endl;
-while(curr != NULL){   
-//cout << node.getKeyCount() << endl;
-cout << curr->key << endl;
-//cout << curr->id.pid << endl;
-cout << endl;
-curr = curr->next;
-}
+    cout << mid << endl;
+    cout << a.end_pid << endl << b.end_pid << endl; */
 
-
- 
-PageId p;
-int key;
-cin >> key;
-node.locateChildPtr(key,p);
-cout << p << endl;
-  
-//node.initializeRoot(6,6,6);
- int mid;
-RecordId rid;
-rid.pid = 0;
-rid.sid = 0;
-node.insert(2,rid);
-node.insert(1,rid);
-node.insert(9,rid);
-node.insert(6,rid);
-  
-//list_node* curr = node.list;
-//cout << "THIS" <<endl;
-//cout << node.getKeyCount() << endl;
-//while(curr != NULL){
-//
-//cout << curr->key << endl;
-//cout << endl;
-//curr = curr->next;
-//}
-    
-     char testbuff[1024];
-    int count = 2;
-    int key1 = 3;
-    int key2 = 7;
-    RecordId rid1;
-    rid1.pid = 2;
-    rid1.sid = 1;
-    RecordId rid2;
-    rid2.pid = 3;
-    rid2.sid = 4;
-    
-    char* ptr = testbuff;
-    memcpy(count, ptr, sizeof(int));
-    ptr+=sizeof(int);
-    memcpy(rid1, ptr, sizeof(RecordId));
-    ptr+=sizeof(RecordId);
-    memcpy(key1, ptr, sizeof(int));
-    ptr+=sizeof(int);
-    memcpy(rid2, ptr, sizeof(RecordId));
-    ptr+=sizeof(RecordId);
-    memcpy(key2, ptr, sizeof(int));
-    
-    ///Dont know how to make this a PageFile that I can pass to BTLeafNode to READ
-    BTLeafNode node;
-
-      
     
 
- cout << "mid = " << mid << endl;
+/* TEST : BTLeafNode::InsertAndSplit 
 
- cout <<endl;
-cout << "SIB " << sib.getKeyCount() << endl;
-curr= sib.list;
-while(curr != NULL){
-cout << curr->key << endl;
-cout << endl;
-curr = curr->next;
-}
-*/
+    a.end_pid = 6;
+    RecordId rid;
+    a.insert(0,rid);
+    a.insert(1,rid);
+    a.insert(2,rid);
+    a.insert(3,rid);
+
+    int mid;
+
+    a.insertAndSplit(4,rid,b,mid);
 
 
-BTreeIndex test;
-RecordId rid; 
-cout << test.insert(5,rid);
-cout << test.insert(6,rid);
-cout << test.insert(7,rid);
-cout << test.insert(8,rid) << endl;
+    list_node* curr = a.list;
+    while(curr != NULL)
+    {
+        cout << curr->key << endl;
+        curr = curr->next;
+    }
+
+    cout << mid << endl;
+    cout << a.end_pid << endl; */
+
+/* TEST : BTIndex::Insert */
+
+/* TEST : BTIndex::locatePtr */
+
+/* TEST : BTIndes::readFOrward */
+
 }
