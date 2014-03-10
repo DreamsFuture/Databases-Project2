@@ -40,6 +40,8 @@ RC BTLeafNode::read(PageId pid, const PageFile& pf)
 {
     //check if the pid is valid
     if(pid < 0 || pid > pf.endPid()) return RC_INVALID_RID;
+
+    memset(buffer,0,1024*sizeof(char));
     
     //read into the main memory buffer (1024 bytes)
     int ret = pf.read(pid,buffer);
@@ -99,6 +101,8 @@ RC BTLeafNode::write(PageId pid, PageFile& pf)
     //check if the pid is valid
 
     if(pid < 0 || pid > pf.endPid()) return RC_INVALID_RID;
+
+    memset(buffer, 0, 1024 * sizeof(char));
     
     char* ptr = buffer;
 
@@ -156,11 +160,13 @@ RC BTLeafNode::insert(int key, const RecordId& rid)
 	list_node* temp = new list_node;
 	temp->key = key;
 	temp->id.rid = rid;
+	temp->next = NULL;
 	list_node* curr = list;
 
 	if(list == NULL)
 		{
 			list = temp;
+			list->next = NULL;
 		}
 
 	else {
@@ -224,6 +230,7 @@ RC BTLeafNode::insertAndSplit(int key, const RecordId& rid,
 	list_node* temp = new list_node;
 	temp->key = key;
 	temp->id.rid = rid;
+	temp->next = NULL;
 	list_node* curr = list;
 
 	if(list == NULL)
@@ -282,11 +289,11 @@ RC BTLeafNode::insertAndSplit(int key, const RecordId& rid,
 	}
 	
 
-siblingKey = mid->next->key;
+siblingKey = mid->key;
 
  /* Add all pairs after mid to the sibling node */
 
-	list_node* nxt = mid->next;
+	list_node* nxt = mid;
 	while(nxt != NULL)
 	{
 		sibling.insert(nxt->key,nxt->id.rid);
@@ -297,21 +304,29 @@ siblingKey = mid->next->key;
 
  /* Free all pairs after the middle one in the current node */
 
-	list_node* curr1 = mid->next;
+	list_node* curr1 = mid;
 	list_node* curr2 = curr1->next;
 	while(curr1 != NULL)
 	{
 		delete curr1;
+		count--;
 		curr1 = curr2;
 		if(curr1 == NULL)
 			break;
 		else curr2 = curr2->next;
 
-		count--;
 	}
 
-	mid->next = NULL;
+
 	
+	list_node* ptr = list;
+	for(int i = 1; i < count; i++)
+	{
+		ptr = ptr->next;
+	}
+
+	ptr->next = NULL;
+
 	return 0;
 }
 
@@ -435,6 +450,8 @@ RC BTNonLeafNode::read(PageId pid, const PageFile& pf)
 { 
     //check if the pid is valid
     if(pid < 0 || pid > pf.endPid()) return RC_INVALID_RID;
+
+    memset(buffer,0,1024*sizeof(char));
     
     //read into the main memory buffer (1024 bytes)
     RC ret = pf.read(pid,buffer);
@@ -499,7 +516,7 @@ RC BTNonLeafNode::write(PageId pid, PageFile& pf)
     char* ptr = buffer;
     
     //initialize buffer to be all zeros before we write in the linked list data
-    memset(ptr, 0, PageFile::PAGE_SIZE);
+    memset(ptr, 0, PageFile::PAGE_SIZE * sizeof(char));
     
     memcpy(ptr, &count, sizeof(int));
     ptr += sizeof(int);
@@ -550,11 +567,13 @@ RC BTNonLeafNode::insert(int key, PageId pid, bool swap)
 	list_node* temp = new list_node;
 	temp->key = key;
 	temp->id.pid = pid;
+	temp->next = NULL;
 	list_node* curr = list;
 
 	if(list == NULL)
 		{
 			list = temp;
+			list->next = NULL;
 		}
 
 	else {
@@ -635,6 +654,7 @@ RC BTNonLeafNode::insertAndSplit(int key, PageId pid, BTNonLeafNode& sibling, in
 	list_node* temp = new list_node;
 	temp->key = key;
 	temp->id.pid = pid;
+	temp->next = NULL;
 	list_node* curr = list;
 
 	if(list == NULL)

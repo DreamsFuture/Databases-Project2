@@ -14,6 +14,7 @@
 #include <iostream>
 #include "BTreeNode.h"
 #include "PageFile.h"
+#include "BTreeIndex.h"
  using namespace std;
 
 
@@ -49,21 +50,16 @@ BTLeafNode a,b;
     cout << mid << endl;
     cout << a.end_pid << endl << b.end_pid << endl; */
 
-    
 
-/* TEST : BTLeafNode::InsertAndSplit 
 
-    a.end_pid = 6;
+ //TEST : BTLeafNode::InsertAndSplit 
+ /*
+
     RecordId rid;
     a.insert(0,rid);
     a.insert(1,rid);
     a.insert(2,rid);
     a.insert(3,rid);
-
-    int mid;
-
-    a.insertAndSplit(4,rid,b,mid);
-
 
     list_node* curr = a.list;
     while(curr != NULL)
@@ -71,14 +67,48 @@ BTLeafNode a,b;
         cout << curr->key << endl;
         curr = curr->next;
     }
+    int mid;
 
-    cout << mid << endl;
-    cout << a.end_pid << endl; */
+    a.insertAndSplit(4,rid,b,mid);
 
-/* TEST : BTIndex::Insert */
 
-/* TEST : BTIndex::locatePtr */
+    while(curr != NULL)
+    {
+        cout << curr->key << endl;
+        curr = curr->next;
+    }
 
-/* TEST : BTIndes::readFOrward */
+    cout << mid << endl; */
+
+ //TEST : BTreeIndex::insert 
+
+    BTreeIndex index;
+    index.open("a",'w');
+    //cout << index.rootPid << endl;
+    //cout << index.treeHeight << endl;
+    RecordId rid;
+    index.insert(1,rid);
+    index.insert(2,rid);
+    index.insert(3,rid);
+    index.insert(4,rid);
+    //index.insert(5,rid);
+
+    BTLeafNode root;
+    cout << index.rootPid << endl;
+    root.read(0,index.pf);
+
+
+    list_node* curr = root.list;
+    while(curr != NULL)
+    {
+        cout << curr->key << "....."  << curr->id.pid <<endl;
+        curr = curr->next;
+    }
+
+    index.close(); 
+
+/* TEST : BTreeIndex::locatePtr */
+
+/* TEST : BTreeIndes::readFOrward */
 
 }
