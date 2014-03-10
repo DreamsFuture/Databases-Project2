@@ -12,13 +12,14 @@
 
 using namespace std;
 
+#include <iostream>
 /*
  * BTreeIndex constructor
  */
 BTreeIndex::BTreeIndex()
 {
-    rootPid = 0;
-    currPid = 0;
+    rootPid = -1;
+    currPid = -1;
     currHeight = 0;
     treeHeight = 0;
 }
@@ -54,6 +55,7 @@ RC BTreeIndex::open(const string& indexname, char mode)
 RC BTreeIndex::close()
 {
     char buffer[1024];
+    memset(buffer,0,1024*sizeof(char));
     char * ptr = buffer;
 
     memcpy(ptr,reinterpret_cast<char*>(&rootPid),sizeof(int));   // Save rootPid to last page
@@ -79,21 +81,35 @@ RC BTreeIndex::insert(int key, const RecordId& rid)
 
     if(treeHeight == 0) /* The tree is empty */
         {
-            int ret;
             BTLeafNode root;
-            root.insert(key, rid);
-            treeHeight++;
-            root.write(rootPid,pf);
+            int ret = root.insert(key, rid);
+
             if(ret < 0) return ret;
-            else return 0;
+            treeHeight++;
+
+            if(rootPid == -1){
+            rootPid = pf.endPid();
+            currPid = rootPid;
+            }
+
+            ret = root.write(rootPid,pf);
+            if(ret < 0) return ret;
         }
 
-    else if(treeHeight == 1)  /* The root is a leaf */
-    { 
+
+    else if(treeHeight == 1) /* Three tree has only a root */
+    {
             BTLeafNode root;
             root.read(rootPid,pf);
 
             int ret = root.insert(key,rid);
+            if(ret == 0)
+            {
+                root.write(rootPid,pf);
+                return 0;
+            }
+
+
             if(ret == RC_NODE_FULL)
             {
                  BTNonLeafNode newRoot;
@@ -101,11 +117,13 @@ RC BTreeIndex::insert(int key, const RecordId& rid)
                  int sibKey;
                  root.insertAndSplit(key,rid,sib,sibKey);
 
+
                  PageId nextId = pf.endPid();
                  sib.write(nextId,pf);
                  root.setNextNodePtr(nextId);
+                 root.write(rootPid,pf);
 
-                 newRoot.insert(rootPid,sibKey,false);
+                 newRoot.insert(sibKey,rootPid,true);
                  newRoot.setEndPid(nextId);
 
                  PageId newRootId = pf.endPid();
@@ -115,78 +133,66 @@ RC BTreeIndex::insert(int key, const RecordId& rid)
                  rootPid = newRootId;
                  currPid = newRootId;
 
-                 return 0;
-
-            }
-
-            else return 0;
-
+             }
     }
 
-    else {  /* The tree has at least two levels */
 
-            std::vector<PageId> path;
-            findInsertLeaf(path,key);  /* Find the leaf to insert into */
+    else { /* The tree has more than one level */ 
 
-            BTLeafNode leaf;
-            leaf.read(*(path.end()-1),pf);
-            path.pop_back();
+    BTLeafNode root;
+    root.read(rootPid,pf);
 
-            int sibKey; 
-            BTLeafNode sibling;
+    std::vector<PageId> path;
+    findInsertLeaf(path,key);
+
+    BTLeafNode insertLeaf;
+    insertLeaf.read(*(path.end()-1),pf);
+    int ret = insertLeaf.insert(key,rid);
+
+    if(ret == 0){
+        insertLeaf.write(*(path.end()-1),pf);
+        return 0;
+    } 
+
+    if(ret == RC_NODE_FULL){
+
+        int sibKey;
+        PageId newPid;
+        BTLeafNode sibling;
+        insertLeaf.insertAndSplit(key,rid,sibling,sibKey);
+
+        newPid = pf.endPid();
+        sibling.write(newPid,pf);
+        insertLeaf.setNextNodePtr(pf.endPid()-1);
+        path.pop_back();
+
+        BTNonLeafNode newBorn;
+        while(path.size() != 0){
 
             BTNonLeafNode parent;
             parent.read(*(path.end()-1),pf);
 
-            if(leaf.insert(key,rid) == RC_NODE_FULL)
-            {
-                leaf.insertAndSplit(key,rid,sibling,sibKey);
+            int retval = parent.insert(sibKey,newPid,true);
 
-                /* Write sibling and set up endpids */
-                PageId sibPid = pf.endPid();
-                PageId temp = leaf.getNextNodePtr();
-                leaf.setNextNodePtr(sibPid);
-                sibling.setNextNodePtr(temp);
-                sibling.write(sibPid,pf);
+            if(retval == 0){
+                parent.write(*(path.end()-1),pf);
+                return 0;
+            } 
 
-                /* Insert sibkey into parents all the way up */
-                 PageId parentPid;
+            parent.insertAndSplit(sibKey,newPid,newBorn,sibKey,true);
 
-                int midKey;
-                while(parent.insert(sibKey,sibPid,true) == RC_NODE_FULL)
-                {
+            parent.write(*(path.end()-1),pf);
 
-                    if(path.size() == 0)   // We've hit the root
-                        {
-                      /*      BTNonLeafNode newRoot;
-                            parent.insertAndSplit(sibKey,sibPid,sibling,midKey,true);
-                            sibling.write(pf.endPid(),pf);
-                            newRoot.setEndPid(pf.endPid());
-                            newRoot.insert(sibKey,parentPid,false);   */
+            path.pop_back();
 
-                        }
 
-                    //parent.insertAndSplit(sibKey,sibPid,sibling,midKey,true);
-                    parent.write(*(path.end()-1),pf);
-
-                    /*Get next parent */
-                    path.pop_back();
-                    parentPid = *(path.end()-1);
-
-                    parent.read(parentPid,pf);
-
-                    midKey = sibKey;
-
-                }
-
-            }
-
-            else return 0; /* There was no overflow */
+        }   
 
     }
 
 
 
+    }   
 
     return 0;
 }
@@ -312,14 +318,14 @@ RC BTreeIndex::findInsertLeaf(std::vector<PageId>& path, int searchKey)
     path.push_back(rootPid);
     PageId next;
     curr.locateChildPtr(searchKey,next);
-    int currHeight = 1;
+    int tempHeight = 1;
 
-    while(currHeight < treeHeight - 1)
+    while(tempHeight < treeHeight - 1)
     {
         curr.read(next,pf);
         path.push_back(next);
         curr.locateChildPtr(searchKey,next);
-        currHeight++;
+        tempHeight++;
     }
 
     path.push_back(next);

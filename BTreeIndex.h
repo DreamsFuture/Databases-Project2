@@ -13,7 +13,6 @@
 #include "Bruinbase.h"
 #include "PageFile.h"
 #include "RecordFile.h"
-
 #include <vector>
              
 /**
@@ -93,12 +92,16 @@ class BTreeIndex {
   RC readForward(IndexCursor& cursor, int& key, RecordId& rid);
 
   RC findInsertLeaf(std::vector<PageId>& path, int searchKey);
+
+  PageId   rootPid;
+  PageFile pf;
+  int      treeHeight;
   
  private:
-  PageFile pf;         /// the PageFile used to store the actual b+tree in disk
+           /// the PageFile used to store the actual b+tree in disk
 
-  PageId   rootPid;    /// the PageId of the root node
-  int      treeHeight; /// the height of the tree
+      /// the PageId of the root node
+   /// the height of the tree
 
   //USED FOR RECURTION
   PageId   currPid;
