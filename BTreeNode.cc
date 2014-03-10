@@ -1,5 +1,6 @@
 #include "BTreeNode.h"
 
+#include <iostream>
 using namespace std;
 
 /* Initialize fields to appropriate 0 values */
@@ -302,7 +303,7 @@ siblingKey = mid->next->key;
 	{
 		delete curr1;
 		curr1 = curr2;
-		if(curr1 = NULL)
+		if(curr1 == NULL)
 			break;
 		else curr2 = curr2->next;
 
@@ -538,7 +539,7 @@ int BTNonLeafNode::getKeyCount()
  * @param pid[IN] the PageId to insert
  * @return 0 if successful. Return an error code if the node is full.
  */
-RC BTNonLeafNode::insert(int key, PageId pid)
+RC BTNonLeafNode::insert(int key, PageId pid, bool swap)
 { 
 	/* Check if node is full */
 	if(count > N-2)
@@ -561,6 +562,11 @@ RC BTNonLeafNode::insert(int key, PageId pid)
 		{
 			temp->next = curr;
 			list = temp;
+			if(swap){
+			int tempPid = list->id.pid;
+			list->id.pid = list->next->id.pid;
+			list->next->id.pid = tempPid;
+		}
 		}
 
 	else {
@@ -569,6 +575,11 @@ RC BTNonLeafNode::insert(int key, PageId pid)
 			if(!curr->next)
 				{
 					curr->next = temp;
+					if(swap){
+					int tempPid = end_pid;
+					end_pid = curr->next->id.pid;
+					curr->next->id.pid = tempPid;
+					}
 					break;
 				}
 
@@ -576,6 +587,11 @@ RC BTNonLeafNode::insert(int key, PageId pid)
 			{
 				temp->next = curr->next;
 				curr->next = temp;
+				if(swap){
+					int tempPid = curr->next->id.pid;
+					curr->next->id.pid = curr->next->next->id.pid;
+					curr->next->next->id.pid = tempPid;
+				}
 				break;
 			}
 
@@ -604,7 +620,7 @@ RC BTNonLeafNode::insert(int key, PageId pid)
  * @param midKey[OUT] the key in the middle after the split. This key should be inserted to the parent node.
  * @return 0 if successful. Return an error code if there is an error.
  */
-RC BTNonLeafNode::insertAndSplit(int key, PageId pid, BTNonLeafNode& sibling, int& midKey)
+RC BTNonLeafNode::insertAndSplit(int key, PageId pid, BTNonLeafNode& sibling, int& midKey, bool swap)
 { 
 
 /* Check that sibling is empty */
@@ -631,6 +647,11 @@ RC BTNonLeafNode::insertAndSplit(int key, PageId pid, BTNonLeafNode& sibling, in
 		{
 			temp->next = curr;
 			list = temp;
+			if(swap){
+			int tempPid = list->id.pid;
+			list->id.pid = list->next->id.pid;
+			list->next->id.pid = tempPid;
+		}
 		}
 
 	else {
@@ -639,6 +660,11 @@ RC BTNonLeafNode::insertAndSplit(int key, PageId pid, BTNonLeafNode& sibling, in
 			if(!curr->next)
 				{
 					curr->next = temp;
+					if(swap){
+					int tempPid = end_pid;
+					end_pid = curr->next->id.pid;
+					curr->next->id.pid = tempPid;
+					}
 					break;
 				}
 
@@ -656,6 +682,8 @@ RC BTNonLeafNode::insertAndSplit(int key, PageId pid, BTNonLeafNode& sibling, in
 	}
 		
 	}
+
+	count++;
 
 /* Find the middle pair in this node */
 
@@ -675,39 +703,54 @@ RC BTNonLeafNode::insertAndSplit(int key, PageId pid, BTNonLeafNode& sibling, in
 	}
 	
 
-midKey = mid->key;
+	midKey = mid->key;
 
  /* Add all pairs after mid to the sibling node */
 
 	list_node* nxt = mid->next;
 	while(nxt != NULL)
 	{
-		sibling.insert(nxt->key,nxt->id.pid);
+		sibling.insert(nxt->key,nxt->id.pid,false);
 		nxt = nxt->next;
 	}
 
 
+/* Set end pids for both siblings */
+
+	sibling.setEndPid(end_pid);
+	end_pid = mid->id.pid;
+	
 
  /* Free all pairs after the middle one in the current node */
 
-	list_node* curr1 = mid->next;
+	list_node* curr1 = mid;
 	list_node* curr2 = curr1->next;
 	while(curr1 != NULL)
 	{
 		delete curr1;
+		count--;
 		curr1 = curr2;
-		if(curr1 = NULL)
+		if(curr1 == NULL)
 			break;
 		else curr2 = curr2->next;
 
-		count--;
 	}
 
-	mid->next = NULL;
-	
+
+	list_node* ptr = list;
+	for(int i = 1; i < count; i++)
+	{
+		ptr = ptr->next;
+	}
+
+	ptr->next = NULL;
+
+
 	return 0;
 
 }
+
+
 
 /*
  * Given the searchKey, find the child-node pointer to follow and
@@ -759,3 +802,4 @@ RC BTNonLeafNode::setEndPid(PageId pid)
 {
 	end_pid = pid;
 }
+

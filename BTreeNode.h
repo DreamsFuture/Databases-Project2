@@ -123,7 +123,9 @@ class BTLeafNode {
     */
     RC write(PageId pid, PageFile& pf);
 
+    
 
+    
     
     
     
@@ -172,7 +174,7 @@ class BTNonLeafNode {
     * @param pid[IN] the PageId to insert
     * @return 0 if successful. Return an error code if the node is full.
     */
-    RC insert(int key, PageId pid);
+    RC insert(int key, PageId pid, bool swap);
 
    /**
     * Insert the (key, pid) pair to the node
@@ -186,7 +188,7 @@ class BTNonLeafNode {
     * @param midKey[OUT] the key in the middle after the split. This key should be inserted to the parent node.
     * @return 0 if successful. Return an error code if there is an error.
     */
-    RC insertAndSplit(int key, PageId pid, BTNonLeafNode& sibling, int& midKey);
+    RC insertAndSplit(int key, PageId pid, BTNonLeafNode& sibling, int& midKey,bool swap);
 
    /**
     * Given the searchKey, find the child-node pointer to follow and
@@ -230,9 +232,11 @@ class BTNonLeafNode {
     RC write(PageId pid, PageFile& pf);
 
     RC setEndPid(PageId pid);
+
     
+
     
-    
+        
 
   private:
    /**

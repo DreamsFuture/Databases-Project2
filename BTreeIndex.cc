@@ -105,7 +105,7 @@ RC BTreeIndex::insert(int key, const RecordId& rid)
                  sib.write(nextId,pf);
                  root.setNextNodePtr(nextId);
 
-                 newRoot.insert(rootPid,sibKey);
+                 newRoot.insert(rootPid,sibKey,false);
                  newRoot.setEndPid(nextId);
 
                  PageId newRootId = pf.endPid();
@@ -129,32 +129,56 @@ RC BTreeIndex::insert(int key, const RecordId& rid)
             findInsertLeaf(path,key);  /* Find the leaf to insert into */
 
             BTLeafNode leaf;
-            leaf.read(*(path.end() - 1),pf); /* Last node on the path is the leaf */
-            
-            int ret = leaf.insert(key,rid); /* Attempt to insert into this leaf */
+            leaf.read(*(path.end()-1),pf);
+            path.pop_back();
 
-            if(ret == RC_NODE_FULL)
+            int sibKey; 
+            BTLeafNode sibling;
+
+            BTNonLeafNode parent;
+            parent.read(*(path.end()-1),pf);
+
+            if(leaf.insert(key,rid) == RC_NODE_FULL)
             {
-                BTLeafNode sibling;
-                int sibKey;
-                leaf.insertAndSplit(key,rid,sibling,sibKey);  // Split leaf
+                leaf.insertAndSplit(key,rid,sibling,sibKey);
 
-                sibling.write(pf.endPid(),pf);
-                leaf.setNextNodePtr(pf.endPid()-1);    // Connect leaf to new sibling
+                /* Write sibling and set up endpids */
+                PageId sibPid = pf.endPid();
+                PageId temp = leaf.getNextNodePtr();
+                leaf.setNextNodePtr(sibPid);
+                sibling.setNextNodePtr(temp);
+                sibling.write(sibPid,pf);
 
-                path.pop_back();  // Delete leaf from path
+                /* Insert sibkey into parents all the way up */
+                 PageId parentPid;
 
-                BTNonLeafNode parent;
-                parent.read(*(path.end()-1),pf);  // Get parent of leaf
-
-                while(parent.insert(sibKey,pf.endPid()-1) == RC_NODE_FULL)
+                int midKey;
+                while(parent.insert(sibKey,sibPid,true) == RC_NODE_FULL)
                 {
-                    int midKey;
-                    parent.insertAndSplit(sibKey,pf.endPid()-1)
+
+                    if(path.size() == 0)   // We've hit the root
+                        {
+                      /*      BTNonLeafNode newRoot;
+                            parent.insertAndSplit(sibKey,sibPid,sibling,midKey,true);
+                            sibling.write(pf.endPid(),pf);
+                            newRoot.setEndPid(pf.endPid());
+                            newRoot.insert(sibKey,parentPid,false);   */
+
+                        }
+
+                    //parent.insertAndSplit(sibKey,sibPid,sibling,midKey,true);
+                    parent.write(*(path.end()-1),pf);
+
+                    /*Get next parent */
+                    path.pop_back();
+                    parentPid = *(path.end()-1);
+
+                    parent.read(parentPid,pf);
+
+                    midKey = sibKey;
+
                 }
 
-
-                
             }
 
             else return 0; /* There was no overflow */
