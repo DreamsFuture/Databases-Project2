@@ -378,7 +378,8 @@ RC BTLeafNode::readEntry(int eid, int& key, RecordId& rid)
  * @return the PageId of the next sibling node 
  */
 PageId BTLeafNode::getNextNodePtr()
-{ return end_pid; }
+{   //TODO: return a value for when there is no end_pid (this node is the last one in the tree)
+    return end_pid; }
 
 /*
  * Set the pid of the next slibling node.
