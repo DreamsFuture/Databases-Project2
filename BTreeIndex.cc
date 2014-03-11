@@ -113,27 +113,28 @@ RC BTreeIndex::insert(int key, const RecordId& rid)
             if(ret == RC_NODE_FULL)
             {
                  BTNonLeafNode newRoot;
-                 BTLeafNode sib;
+                 BTLeafNode sibling;
                  int sibKey;
-                 root.insertAndSplit(key,rid,sib,sibKey);
 
+                 root.insertAndSplit(key,rid,sibling,sibKey);
 
-                 PageId nextId = pf.endPid();
-                 sib.write(nextId,pf);
-                 root.setNextNodePtr(nextId);
+                 PageId sibPid = pf.endPid();
+                 sibling.write(sibPid,pf);
+                 root.setNextNodePtr(sibPid);
+
                  root.write(rootPid,pf);
+                 sibling.write(sibPid,pf);
 
-                 newRoot.insert(sibKey,rootPid,true);
-                 newRoot.setEndPid(nextId);
+                 newRoot.insert(sibKey,rootPid,false);
+                 newRoot.setEndPid(sibPid);
 
-                 PageId newRootId = pf.endPid();
-                 newRoot.write(newRootId,pf);
+                 PageId newRootPid = pf.endPid();
+                 newRoot.write(newRootPid,pf);
 
                  treeHeight++;
-                 rootPid = newRootId;
-                 currPid = newRootId;
-
-             }
+                 rootPid = newRootPid;
+                 currPid = newRootPid;
+            }
     }
 
 
@@ -167,9 +168,11 @@ RC BTreeIndex::insert(int key, const RecordId& rid)
         path.pop_back();
 
         BTNonLeafNode newBorn;
+        
+        PageId parentPid;
         while(path.size() != 0){
-
             BTNonLeafNode parent;
+            
             parent.read(*(path.end()-1),pf);
 
             int retval = parent.insert(sibKey,newPid,true);
@@ -182,11 +185,25 @@ RC BTreeIndex::insert(int key, const RecordId& rid)
             parent.insertAndSplit(sibKey,newPid,newBorn,sibKey,true);
 
             parent.write(*(path.end()-1),pf);
+            newPid = pf.endPid();
+            newBorn.write(newPid,pf);
 
+            parentPid = *(path.end()-1);
             path.pop_back();
 
 
         }   
+
+        BTNonLeafNode newRoot;
+        newRoot.insert(sibKey,parentPid,false);
+        newRoot.setEndPid(newPid);
+
+        PageId newrootPid = pf.endPid();
+        newRoot.write(newrootPid,pf);
+
+        treeHeight++;
+        rootPid = newrootPid;
+        currPid = newrootPid;
 
     }
 

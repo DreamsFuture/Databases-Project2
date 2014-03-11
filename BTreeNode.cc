@@ -293,7 +293,7 @@ siblingKey = mid->key;
 
  /* Add all pairs after mid to the sibling node */
 
-	list_node* nxt = mid;
+	list_node* nxt = mid->next;
 	while(nxt != NULL)
 	{
 		sibling.insert(nxt->key,nxt->id.rid);
@@ -304,7 +304,7 @@ siblingKey = mid->key;
 
  /* Free all pairs after the middle one in the current node */
 
-	list_node* curr1 = mid;
+	list_node* curr1 = mid->next;
 	list_node* curr2 = curr1->next;
 	while(curr1 != NULL)
 	{
@@ -325,7 +325,7 @@ siblingKey = mid->key;
 		ptr = ptr->next;
 	}
 
-	ptr->next = NULL;
+	mid->next = NULL;
 
 	return 0;
 }
