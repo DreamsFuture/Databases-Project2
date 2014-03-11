@@ -54,17 +54,17 @@ RC SqlEngine::select(int attr, const string& table, const vector<SelCond>& cond)
   bool useTree = false;
   bool validWhere = true;
   int keyEQCond = -2;
-  vector<SELCond> keyNECond;
+  vector<SelCond> keyNECond;
   int keyLECond = -2;
   int keyGECond = -2;
-  vector<SELCond> valueCond;
+  vector<SelCond> valueCond;
   
   if((rc = index.open(table+".idx", 'r') == 0))
   {
         
     for(unsigned i = 0; i < cond.size(); i++)
     {
-        if(cond[i].attr == 1 && cond[i].comp != NE)
+        if(cond[i].attr == 1 && cond[i].comp != SelCond::NE)
             useTree = true;
         if(cond[i].attr == 1)
         {
@@ -187,7 +187,7 @@ RC SqlEngine::select(int attr, const string& table, const vector<SelCond>& cond)
   count = 0;
   if(useTree && validWhere)
   {
-      indexCursor cursor;
+      IndexCursor cursor;
       if(keyEQCond != -2)
       {
           index.locate(keyEQCond, cursor);
@@ -199,7 +199,7 @@ RC SqlEngine::select(int attr, const string& table, const vector<SelCond>& cond)
               index.close();
               return rc;
           }
-          for(unsigned i=0; i<valueCond; i++)
+          for(unsigned i=0; i<valueCond.size(); i++)
           {
               diff = strcmp(value.c_str(), valueCond[i].value);
               // skip the tuple if any condition is not met
@@ -242,6 +242,7 @@ RC SqlEngine::select(int attr, const string& table, const vector<SelCond>& cond)
                   break;
           }
           end_EQ:
+          ;
       }
       else //if(keyGECond != -2) Dont think I need this, want to start from leftmost leaf node in the tree, and calling locate on -2 will do this
       {
@@ -263,7 +264,7 @@ RC SqlEngine::select(int attr, const string& table, const vector<SelCond>& cond)
               //check NE Conditions on key
               for(unsigned i=0; i < keyNECond.size(); i++)
               {
-                  if(keyNECond[i] == key)
+                  if(atoi(keyNECond[i].value) == key)
                       goto next_GE;
               }
               
@@ -312,8 +313,15 @@ RC SqlEngine::select(int attr, const string& table, const vector<SelCond>& cond)
               }
               
             next_GE:
+              ;
           }
       }
+      
+      // print matching tuple count if "select count(*)"
+      if (attr == 4) {
+          fprintf(stdout, "%d\n", count);
+      }
+      rc = 0;
       rf.close();
       index.close();
       rc = 0;
@@ -416,11 +424,11 @@ RC SqlEngine::load(const string& table, const string& loadfile, bool index)
   if (retval < 0)
       return retval;
     
+  BTreeIndex BTree;
   /* Create an index for this table when applicable */
   if(index)
   {
-      string BTree_file_name = table + ".idx"
-      BTreeIndex BTree;
+      string BTree_file_name = table + ".idx";
       retval = BTree.open(BTree_file_name, 'w');
       if(retval < 0)
           return retval;
