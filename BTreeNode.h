@@ -31,7 +31,7 @@ typedef struct list_node list_node;
 //OLD
 //#define N (int)((PageFile::PAGE_SIZE - sizeof(int) - sizeof(PageId) - sizeof(list_node*))/sizeof(list_node))
 //NEW
-#define N 3 // (int)((PageFile::PAGE_SIZE - sizeof(int) - sizeof(PageId))/(sizeof(RecordId)+sizeof(int)))
+#define N (int)((PageFile::PAGE_SIZE - sizeof(int) - sizeof(PageId))/(sizeof(RecordId)+sizeof(int)))
 
 
 /**

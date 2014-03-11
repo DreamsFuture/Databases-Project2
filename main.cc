@@ -21,10 +21,10 @@
 int main()
 {
   // run the SQL engine taking user commands from standard input (console).
-  //SqlEngine::run(stdin);
+  SqlEngine::run(stdin);
 
 
-BTLeafNode a,b;
+//BTLeafNode a,b;
 
 /* TEST : BTNonLeafNode::Insert with swap; 
 
@@ -80,7 +80,7 @@ BTLeafNode a,b;
 
     cout << mid << endl; */
 
- /*TEST : BTreeIndex::insert */
+ /*TEST : BTreeIndex::insert 
 
     BTreeIndex index;
     index.open("a",'w');
@@ -108,7 +108,7 @@ BTLeafNode a,b;
         curr = curr->next;
     }
 
-    cout << root.end_pid << endl;
+    cout << root.end_pid << endl; */
 
 /* TEST : BTreeIndex::locatePtr */
 
