@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
 /**
  * Copyright (C) 2008 by The Regents of the University of California
  * Redistribution of this file is permitted under the terms of the GNU
@@ -326,7 +324,6 @@ RC SqlEngine::select(int attr, const string& table, const vector<SelCond>& cond)
       rc = 0;
       rf.close();
       index.close();
-      rc = 0;
   }
   else if(validWhere)
   {
@@ -406,7 +403,7 @@ RC SqlEngine::select(int attr, const string& table, const vector<SelCond>& cond)
       rf.close();
     }
     return rc;
-  }
+}
 
 RC SqlEngine::load(const string& table, const string& loadfile, bool index)
 {
@@ -1011,7 +1008,3 @@ RC SqlEngine::parseLoadLine(const string& line, int& key, string& value)
 
     return 0;
 }
-<<<<<<< HEAD
->>>>>>> 1bfe994ba07d69c624c83659e395570ca58d713a
-=======
->>>>>>> FETCH_HEAD
