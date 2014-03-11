@@ -31,7 +31,7 @@ typedef struct list_node list_node;
 //OLD
 //#define N (int)((PageFile::PAGE_SIZE - sizeof(int) - sizeof(PageId) - sizeof(list_node*))/sizeof(list_node))
 //NEW
-#define N 4 // (int)((PageFile::PAGE_SIZE - sizeof(int) - sizeof(PageId))/(sizeof(RecordId)+sizeof(int)))
+#define N 3 // (int)((PageFile::PAGE_SIZE - sizeof(int) - sizeof(PageId))/(sizeof(RecordId)+sizeof(int)))
 
 
 /**
@@ -125,7 +125,7 @@ class BTLeafNode {
 
     list_node* list;
     
-
+PageId end_pid;
 
     
     
@@ -153,7 +153,7 @@ class BTLeafNode {
      * Pid that points to the node that holds keys greater than all the keys in this node.
      * i.e. last pid in the list
      */
-     PageId end_pid;
+     
 }; 
 
 

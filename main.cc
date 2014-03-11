@@ -21,7 +21,7 @@
 int main()
 {
   // run the SQL engine taking user commands from standard input (console).
- // SqlEngine::run(stdin);
+  //SqlEngine::run(stdin);
 
 
 BTLeafNode a,b;
@@ -80,7 +80,7 @@ BTLeafNode a,b;
 
     cout << mid << endl; */
 
- //TEST : BTreeIndex::insert 
+ /*TEST : BTreeIndex::insert */
 
     BTreeIndex index;
     index.open("a",'w');
@@ -91,12 +91,15 @@ BTLeafNode a,b;
     index.insert(2,rid);
     index.insert(3,rid);
     index.insert(4,rid);
-    //index.insert(5,rid);
+    index.insert(5,rid);
+    index.insert(6,rid);
+    index.insert(7,rid);
 
     BTLeafNode root;
     cout << index.rootPid << endl;
-    root.read(0,index.pf);
+    root.read(3,index.pf);
 
+    index.close();  
 
     list_node* curr = root.list;
     while(curr != NULL)
@@ -105,10 +108,10 @@ BTLeafNode a,b;
         curr = curr->next;
     }
 
-    index.close(); 
+    cout << root.end_pid << endl;
 
 /* TEST : BTreeIndex::locatePtr */
 
-/* TEST : BTreeIndes::readFOrward */
+/* TEST : BTreeIndes::readForward */
 
 }
