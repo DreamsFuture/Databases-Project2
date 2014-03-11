@@ -33,7 +33,9 @@ BTreeIndex::BTreeIndex()
  */
 RC BTreeIndex::open(const string& indexname, char mode)
 {
-    pf.open(indexname,mode);
+    RC ret = pf.open(indexname,mode);
+    if( ret < 0)
+        return ret;
     char buffer[1024];
     char* ptr = buffer;
     pf.read(pf.endPid()-1, buffer); 

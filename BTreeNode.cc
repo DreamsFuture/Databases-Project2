@@ -8,7 +8,7 @@ BTLeafNode::BTLeafNode()
 {
 	count = 0;
 	list = NULL;
-	end_pid = 0;
+	end_pid = -1;
 }
 
 /* Free all the allocated key/rid airs */
@@ -394,7 +394,9 @@ RC BTLeafNode::readEntry(int eid, int& key, RecordId& rid)
  * @return the PageId of the next sibling node 
  */
 PageId BTLeafNode::getNextNodePtr()
-{ return end_pid; }
+{   //TODO: return a value for when there is no end_pid (this node is the last one in the tree)
+    //end_pid being
+    return end_pid; }
 
 /*
  * Set the pid of the next slibling node.
@@ -821,5 +823,6 @@ RC BTNonLeafNode::initializeRoot(PageId pid1, int key, PageId pid2)
 RC BTNonLeafNode::setEndPid(PageId pid)
 {
 	end_pid = pid;
+    return 0;
 }
 
