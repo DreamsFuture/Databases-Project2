@@ -304,6 +304,10 @@ RC BTreeIndex::readForward(IndexCursor& cursor, int& key, RecordId& rid)
     {
         cursor.pid = node.getNextNodePtr();
         //TODO: when to return the return code for reaching the end of the tree
+        if(cursor.pid == -1)
+        {
+            return RC_END_OF_TREE;
+        }
         cursor.eid = 0;
     }
     else
